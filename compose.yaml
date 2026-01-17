@@ -1,0 +1,17 @@
+name: local
+
+services:
+  terraform:
+    build:
+      context: ./docker/build
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: .
+        target: /home/terraform/workspace
+      - type: bind
+        source: ./docker/bind/gcloud
+        target: /home/terraform/.config/gcloud
+    working_dir: /home/terraform/workspace
