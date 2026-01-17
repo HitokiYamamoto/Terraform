@@ -1,0 +1,11 @@
+# Ignore ENV files
+.env
+terraform.tfvars
+
+# Ignore Terraform state files
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
+
+# Ignore Google Cloud credentials
+docker/bind
