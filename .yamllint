@@ -1,0 +1,10 @@
+extends: default
+
+rules:
+  document-start: disable  # --- を無効化
+  truthy: disable  # on, yes, noなどを無効化
+  indentation:
+    spaces: 2
+    indent-sequences: true  # リストもインデントする
+    check-multi-line-strings: false  # 複数行文字列のインデントを無効化
+  line-length: disable  # 行の長さを無効化

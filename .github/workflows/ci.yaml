@@ -1,7 +1,11 @@
 name: Terraform
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Check Yaml Files"]
+    types:
+      - completed
+  workflow_dispatch:
 
 jobs:
   format-check:

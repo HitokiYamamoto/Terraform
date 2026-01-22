@@ -1,18 +1,18 @@
-name: 'Google Cloud OIDC認証'
-description: 'Workload Identity連携を使用してGoogle Cloudに認証します'
+name: Google Cloud OIDC認証
+description: Workload Identity連携を使用してGoogle Cloudに認証します
 
 inputs:
   workload_identity_provider:
-    description: 'Workload Identity ProviderのリソースID (省略時は環境変数 WORKLOAD_IDENTITY_PROVIDER を使用)'
+    description: Workload Identity ProviderのリソースID (省略時は環境変数 WORKLOAD_IDENTITY_PROVIDER を使用)
     required: false
-    default: ''
+    default: ""
   service_account:
-    description: 'サービスアカウントのメールアドレス (省略時は環境変数 SERVICE_ACCOUNT を使用)'
+    description: サービスアカウントのメールアドレス (省略時は環境変数 SERVICE_ACCOUNT を使用)
     required: false
-    default: ''
+    default: ""
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: 認証情報の設定
       shell: bash
