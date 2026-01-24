@@ -1,0 +1,46 @@
+name: Check Go Files
+
+on:
+  push:
+    paths:
+      - "google-cloud/notification/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go and Task
+        uses: ./.github/actions/setup-go-task
+
+      - name: Run Lint Task
+        working-directory: google-cloud/notification
+        run: task lint-check
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go and Task
+        uses: ./.github/actions/setup-go-task
+
+      - name: Run Test Task
+        working-directory: google-cloud/notification
+        run: task test
+
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go and Task
+        uses: ./.github/actions/setup-go-task
+
+      - name: Run Format Check Task
+        working-directory: google-cloud/notification
+        run: task format-check

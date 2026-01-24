@@ -1,0 +1,26 @@
+name: Setup Go and Task
+description: Common setup for Go and Task
+inputs:
+  go-version:
+    description: "Go version to use"
+    required: false
+    default: "1.25.5"
+  task-version:
+    description: "Task version to use"
+    required: false
+    default: "3.46.4"
+runs:
+  using: composite
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v6
+
+    - name: Set up Golang
+      uses: actions/setup-go@v6
+      with:
+        go-version: ${{ inputs.go-version }}
+
+    - name: Install Task
+      uses: go-task/setup-task@v1
+      with:
+        version: ${{ inputs.task-version }}
