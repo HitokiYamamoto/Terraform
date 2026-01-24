@@ -32,7 +32,10 @@ lint:
 
 # security scan with trivy
 trivy:
-    docker run --rm -it --mount type=bind,source=$(pwd),target=/app --workdir /app aquasec/trivy:0.68.2 config .
+    docker run --rm -it \
+        --mount type=bind,source=$(pwd),target=/app \
+        --workdir /app \
+        aquasec/trivy:0.68.2 fs --scanners config,vuln .
 
 # Prettier for YAML files
 prettier:
