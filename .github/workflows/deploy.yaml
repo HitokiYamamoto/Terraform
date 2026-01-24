@@ -35,5 +35,5 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=google-cloud init
 
-      - name: Terraform Plan
+      - name: Terraform Apply
         run: terraform -chdir=google-cloud apply -auto-approve
