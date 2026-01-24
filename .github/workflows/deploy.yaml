@@ -36,4 +36,25 @@ jobs:
         run: terraform -chdir=google-cloud init
 
       - name: Terraform Plan
-        run: terraform -chdir=google-cloud apply -auto-approve
+        id: plan
+        run: |
+          set +e # エラーでも止まらないようにする
+          terraform -chdir=google-cloud plan -detailed-exitcode -input=false
+          exitcode=$?
+
+          if [ $exitcode -eq 2 ]; then
+            echo "差分を検知しました。Applyを準備します。"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            exit 0
+          elif [ $exitcode -eq 0 ]; then
+            echo "差分はありません。Applyをスキップします。"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "Terraform Planでエラーが発生しました。"
+            exit 1
+          fi
+
+      - name: Terraform Apply
+        if: steps.plan.outputs.has_changes == 'true'
+        run: terraform -chdir=google-cloud apply -auto-approve -input=false

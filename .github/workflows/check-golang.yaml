@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - "google-cloud/notification/**"
+    branches-ignore:
+      - main
 
 jobs:
   lint:
