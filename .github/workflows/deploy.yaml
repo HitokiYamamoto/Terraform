@@ -1,0 +1,36 @@
+name: Terraform Apply to Google Cloud
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+      TF_VAR_project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.3
+
+      - name: Google Cloud認証
+        uses: ./.github/actions/auth-google-cloud
+
+      - name: Terraform Init
+        run: terraform -chdir=google-cloud init
+
+      - name: Terraform Plan
+        run: terraform -chdir=google-cloud apply -auto-approve
