@@ -7,8 +7,8 @@ locals {
   ]
 
   secrets = ({
-    SLACK_BOT_USER_OAUTH_TOKEN = module.slack_channel_name.secret_id,
-    CHANNEL_NAME               = module.slack_oauth_token.secret_id,
+    SLACK_BOT_USER_OAUTH_TOKEN = module.slack_oauth_token.secret_id
+    CHANNEL_NAME               = module.slack_channel_name.secret_id,
   })
 }
 
