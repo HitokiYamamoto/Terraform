@@ -12,6 +12,13 @@ gcloud-login:
 # terraform commands
 terraform +args:
     docker compose run --rm terraform \
+        terraform -chdir=bootstrap {{ args }}
+
+# terraform commands with service account impersonation
+terraform-impersonate service_account +args:
+    docker compose run --rm \
+        --env GOOGLE_IMPERSONATE_SERVICE_ACCOUNT={{ service_account }} \
+        terraform \
         terraform -chdir=google-cloud {{ args }}
 
 # terraform fmt
@@ -25,7 +32,10 @@ lint:
 
 # security scan with trivy
 trivy:
-    docker run --rm -it --mount type=bind,source=$(pwd),target=/app --workdir /app aquasec/trivy:0.68.2 config .
+    docker run --rm -it \
+        --mount type=bind,source=$(pwd),target=/app \
+        --workdir /app \
+        aquasec/trivy:0.68.2 fs --scanners config,vuln .
 
 # Prettier for YAML files
 prettier:
@@ -34,3 +44,7 @@ prettier:
 # Lint check for YAML files
 yamllint:
     docker compose run --rm yamllint .
+
+task +args="":
+    docker compose run --rm golang \
+        task {{ args }}

@@ -1,0 +1,12 @@
+FROM golang:1.26rc2-trixie
+
+# https://taskfile.dev/docs/installation#install-script
+RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
+RUN useradd -m -s /bin/bash golang && \
+    mkdir -p /home/go && \
+    chown -R golang:golang /home/go
+
+WORKDIR /go/src
+
+USER golang

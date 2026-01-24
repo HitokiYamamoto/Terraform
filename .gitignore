@@ -9,3 +9,6 @@ terraform.tfstate.backup
 
 # Ignore Google Cloud credentials
 docker/bind
+
+# Ignore zip files
+google-cloud/notification/function_source.zip

@@ -6,28 +6,6 @@
 2. Backend用のGCSバケット
 */
 
-/* IAM Service Account Credentials API
-# サービスアカウントの認証情報（アクセストークンなど）を生成・管理するためのAPI
-# OIDC認証後にGoogle Cloudリソースへアクセスする際に必要
-*/
-resource "google_project_service" "iamcredentials" {
-  project = var.project_id
-  service = "iamcredentials.googleapis.com"
-
-  disable_on_destroy = false
-}
-
-/* Security Token Service (STS) API
-# 外部IDプロバイダー（GitHub）のOIDCトークンをGoogle Cloudの認証情報に交換するAPI
-# Workload Identity連携の核となるサービス
-*/
-resource "google_project_service" "sts" {
-  project = var.project_id
-  service = "sts.googleapis.com"
-
-  disable_on_destroy = false
-}
-
 module "default_service_account" {
   source       = "../google-cloud/modules/service_account"
   account_id   = "default-terraform-sa"
