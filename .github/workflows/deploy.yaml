@@ -20,6 +20,8 @@ jobs:
       WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
       SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
       TF_VAR_project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
+      TF_VAR_project_number: ${{ secrets.GOOGLE_CLOUD_PROJECT_NUMBER }}
+      TF_VAR_billing_account_id: ${{ secrets.GOOGLE_CLOUD_BILLING_ACCOUNT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

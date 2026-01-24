@@ -5,6 +5,7 @@ locals {
     "roles/artifactregistry.admin",
     "roles/cloudfunctions.admin",
     "roles/resourcemanager.projectIamAdmin", # プロジェクトレベルのIAMポリシーを変更する権限
+    "roles/pubsub.admin",
   ]
   # dataリソースで取得したいサービスアカウント名のリスト
   target_service_account_names = [
@@ -46,4 +47,11 @@ resource "google_project_iam_member" "service_account_roles" {
   project = var.project_id
   role    = each.value
   member  = module.default_service_account.member
+}
+
+# サービスアカウントに請求管理者権限を付与
+resource "google_billing_account_iam_member" "billing_admin" {
+  billing_account_id = var.billing_account_id
+  role               = "roles/billing.admin"
+  member             = module.default_service_account.member
 }

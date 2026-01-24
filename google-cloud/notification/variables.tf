@@ -3,3 +3,15 @@ variable "project_id" {
   type        = string
   sensitive   = true
 }
+
+variable "project_number" {
+  description = "Google Cloud Project Number"
+  type        = string
+  sensitive   = true
+}
+
+variable "billing_account_id" {
+  description = "Google Cloud Billing Account ID"
+  type        = string
+  sensitive   = true
+}

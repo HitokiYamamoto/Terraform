@@ -21,3 +21,9 @@ variable "impersonators" {
   type        = list(string)
   sensitive   = true
 }
+
+variable "billing_account_id" {
+  description = "Google Cloud Billing Account ID"
+  type        = string
+  sensitive   = true
+}

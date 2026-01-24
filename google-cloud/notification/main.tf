@@ -3,6 +3,7 @@ locals {
     "roles/logging.logWriter",
     "roles/artifactregistry.writer",
     "roles/storage.objectViewer",
+    "roles/cloudbuild.builds.builder",
   ]
 }
 
@@ -85,7 +86,7 @@ resource "google_artifact_registry_repository" "function_repo" {
 }
 
 resource "google_cloudfunctions2_function" "function" {
-  name        = "gcf-function"
+  name        = "budget-alert-function"
   location    = "us-central1"
   description = "Budget Alert to Slack Function"
 
@@ -113,5 +114,164 @@ resource "google_cloudfunctions2_function" "function" {
     available_memory      = "256M"
     timeout_seconds       = 60
     service_account_email = module.service_account.email
+    ingress_settings      = "ALLOW_ALL" # セキュリティ強化のため内部トラフィックのみ許可
+  }
+}
+
+resource "google_cloud_run_service_iam_binding" "invoker" {
+  location = google_cloudfunctions2_function.function.location
+  service  = google_cloudfunctions2_function.function.name
+  role     = "roles/run.invoker"
+  members = [
+    module.service_account.member,
+  ]
+}
+
+/* Pub/Subの作成
+Cloud Functions（特に第2世代）において Pub/Sub トリガーを利用する場合、
+Cloud Functions（Eventarc）に管理を任せたほうが、構築・運用コストが圧倒的に低いので、
+サブスクリプションを作ると逆に面倒になるため、Topicのみを作成する(と、Geminiが言ってた...)
+*/
+# メインのトピック
+resource "google_pubsub_topic" "budget_alert_topic" {
+  name    = "budget-alert-topic"
+  project = var.project_id
+}
+
+# 存在しなくてエラーになるので一旦コメントアウト
+# resource "google_pubsub_topic_iam_member" "billing_publisher" {
+#   topic = google_pubsub_topic.budget_alert_topic.name
+#   role  = "roles/pubsub.publisher"
+
+#   # Cloud Billing 固有のサービスアカウント
+#   member = "serviceAccount:service-${var.project_number}@gcp-sa-cloudbilling.iam.gserviceaccount.com"
+# }
+
+# デッドレター用トピック（エラーになったメッセージの墓場）
+resource "google_pubsub_topic" "budget_alert_dead_letter" {
+  name    = "budget-alert-dead-letter"
+  project = var.project_id
+}
+
+# デッドレター用トピックの権限（Pub/Subがここに書き込めるようにする）
+resource "google_pubsub_topic_iam_binding" "dlq_publisher" {
+  topic = google_pubsub_topic.budget_alert_dead_letter.name
+  role  = "roles/pubsub.publisher"
+  members = [
+    "serviceAccount:service-${var.project_number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  ]
+}
+
+# サブスクリプションの権限（Pub/SubがここからAckできるようにする）
+resource "google_pubsub_subscription_iam_binding" "dlq_subscriber" {
+  subscription = google_pubsub_subscription.budget_alert_subscription.name
+  role         = "roles/pubsub.subscriber"
+  members = [
+    "serviceAccount:service-${var.project_number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  ]
+}
+
+# メインのサブスクリプション
+resource "google_pubsub_subscription" "budget_alert_subscription" {
+  name  = "budget-alert-sub"
+  topic = google_pubsub_topic.budget_alert_topic.name
+
+  # Push設定：Cloud Functions (Cloud Run) のURLを叩く
+  push_config {
+    push_endpoint = google_cloudfunctions2_function.function.service_config[0].uri
+
+    # セキュリティ設定：このSAの権限を使って関数を叩く
+    oidc_token {
+      service_account_email = module.service_account.email
+    }
+  }
+
+  # デッドレターポリシー
+  dead_letter_policy {
+    dead_letter_topic     = google_pubsub_topic.budget_alert_dead_letter.id
+    max_delivery_attempts = 5 # 5回失敗したらデッドレターへ送る
+  }
+
+  # 再試行ポリシー（即時再送による攻撃を防ぐ）
+  retry_policy {
+    minimum_backoff = "10s"  # 最初は10秒待つ
+    maximum_backoff = "600s" # 最大10分待つ
+  }
+}
+
+# デッドレタートピック用のサブスクリプション（メッセージ保管庫）
+resource "google_pubsub_subscription" "budget_alert_dead_letter_sub" {
+  name  = "budget-alert-dead-letter-sub"
+  topic = google_pubsub_topic.budget_alert_dead_letter.name
+
+  # Pull型にする（push_configを書かなければ自動的にPull型になる）
+
+  # メッセージの保持期間（最大7日）
+  # これを設定しておかないと、調査する前に消える可能性がある
+  message_retention_duration = "604800s" # 7日間
+
+  # サブスクリプション自体の有効期限（無期限にする設定）
+  # 31日間アクティブでないと削除されるのを防ぐ
+  expiration_policy {
+    ttl = ""
+  }
+}
+
+# 予算アラートの作成
+resource "google_billing_budget" "budget_any_cost" {
+  billing_account = var.billing_account_id
+  display_name    = "【緊急】課金発生アラート"
+
+  budget_filter {
+    projects = ["projects/${var.project_number}"]
+  }
+
+  amount {
+    specified_amount {
+      currency_code = "JPY"
+      units         = "1" # 予算を「1円」に設定
+    }
+  }
+
+  threshold_rules {
+    threshold_percent = 1.0 # 1円の100% = 1円を超えたら通知
+  }
+
+  all_updates_rule {
+    pubsub_topic = google_pubsub_topic.budget_alert_topic.id
+  }
+}
+
+resource "google_billing_budget" "budget_standard" {
+  billing_account = var.billing_account_id
+  display_name    = "月次予算管理 (1万円)"
+
+  budget_filter {
+    projects = ["projects/${var.project_number}"]
+  }
+
+  amount {
+    specified_amount {
+      currency_code = "JPY"
+      units         = "10000"
+    }
+  }
+
+  # 25%(2000円), 50%(5000円), 90%(9000円), 100%(1万円) で通知
+  threshold_rules {
+    threshold_percent = 0.25
+  }
+  threshold_rules {
+    threshold_percent = 0.5
+  }
+  threshold_rules {
+    threshold_percent = 0.9
+  }
+  threshold_rules {
+    threshold_percent = 1.0
+  }
+
+  all_updates_rule {
+    pubsub_topic = google_pubsub_topic.budget_alert_topic.id
   }
 }

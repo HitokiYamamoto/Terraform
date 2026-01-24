@@ -79,3 +79,42 @@ resource "google_project_service" "cloudresourcemanager" {
 
   disable_on_destroy = false
 }
+
+/* Pub/Sub API
+# Pub/Subトピックの作成・管理に必要なAPI
+*/
+resource "google_project_service" "pubsub" {
+  project = var.project_id
+  service = "pubsub.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+/* Cloud Billing API
+# 予算アラートの作成・管理に必要なAPI
+*/
+resource "google_project_service" "cloud_billing" {
+  project = var.project_id
+  service = "cloudbilling.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+/* Billing Budgets API
+# 予算アラートの作成・管理に必要なAPI
+*/
+resource "google_project_service" "billing_budgets" {
+  project = var.project_id
+  service = "billingbudgets.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+/* Eventarc API
+# Cloud Functions (第2世代) のイベントトリガーに必要なAPI
+*/
+resource "google_project_service" "eventarc" {
+  project            = var.project_id
+  service            = "eventarc.googleapis.com"
+  disable_on_destroy = false
+}
