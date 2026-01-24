@@ -15,3 +15,9 @@ variable "github_repo_id" {
   type        = string
   sensitive   = true
 }
+
+variable "impersonators" {
+  description = "The member to grant the impersonate role to"
+  type        = list(string)
+  sensitive   = true
+}
