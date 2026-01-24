@@ -1,0 +1,77 @@
+version: "3"
+
+tasks:
+  default:
+    desc: "タスク一覧を表示"
+    cmds:
+      - task --list
+
+  init:
+    desc: "Goモジュールを初期化"
+    cmds:
+      - go mod init github.com/HitokiYamamoto/Terraform/google-cloud/notification
+    status:
+      - test -f go.mod # go.modが存在しない場合にのみ実行
+
+  tidy:
+    desc: "go mod tidyを実行"
+    cmds:
+      - go mod tidy
+
+  build:
+    desc: "アプリをビルド"
+    cmds:
+      - GOOS=linux GOARCH=amd64 go build -o bin/linux/notification cmd/main.go
+      - GOOS=windows GOARCH=amd64 go build -o bin/windows/notification.exe cmd/main.go
+      - GOOS=darwin GOARCH=amd64 go build -o bin/mac/notification cmd/main.go
+
+  run:
+    desc: "アプリを実行"
+    cmds:
+      - go run cmd/main.go
+
+  test:
+    desc: "テストを実行"
+    cmds:
+      - go test -v ./...
+
+  fmt:
+    desc: "コードをフォーマット"
+    cmds:
+      - go fmt ./...
+
+  format-check:
+    desc: "フォーマットのチェック（変更なし）"
+    silent: true
+    cmds:
+      - |
+        if [ -n "$(gofmt -l .)" ]; then
+          echo "❌ フォーマットされてないファイルがあるよ:"
+          gofmt -l .
+          exit 1
+        else
+          echo "✨ フォーマットOK!"
+        fi
+
+  vet:
+    desc: "コードをチェック"
+    cmds:
+      - go vet ./...
+
+  lint:
+    desc: "全部まとめてチェック"
+    deps: [fmt, vet, tidy]
+    cmds:
+      - echo "✨ 全部キレイになったよ！"
+
+  lint-check:
+    desc: "コードチェック（変更なし・CI用）"
+    silent: true
+    cmds:
+      - go vet ./...
+      - echo "✨ リントチェックOK!"
+
+  clean:
+    desc: "ビルド成果物を削除"
+    cmds:
+      - rm -rf bin/

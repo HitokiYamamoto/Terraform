@@ -34,3 +34,7 @@ prettier:
 # Lint check for YAML files
 yamllint:
     docker compose run --rm yamllint .
+
+task +args="":
+    docker compose run --rm golang \
+        task {{ args }}

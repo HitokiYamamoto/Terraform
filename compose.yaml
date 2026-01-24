@@ -31,3 +31,13 @@ services:
         source: .
         target: /workspace
     working_dir: /workspace
+
+  golang:
+    build:
+      context: ./docker/build
+      dockerfile: Dockerfile.golang
+    volumes:
+      - type: bind
+        source: ./google-cloud/notification
+        target: /home/go/app
+    working_dir: /home/go/app
