@@ -124,4 +124,4 @@ jobs:
         run: terraform -chdir=google-cloud validate
 
       - name: Terraform Plan
-        run: terraform -chdir=google-cloud plan
+        run: terraform -chdir=google-cloud plan -input=false
