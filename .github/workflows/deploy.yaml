@@ -30,6 +30,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.3
+          terraform_wrapper: false
 
       - name: Google Cloud認証
         uses: ./.github/actions/auth-google-cloud
