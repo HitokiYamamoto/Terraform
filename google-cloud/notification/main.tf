@@ -173,15 +173,6 @@ resource "google_pubsub_topic" "budget_alert_topic" {
   project = var.project_id
 }
 
-# 存在しなくてエラーになるので一旦コメントアウト
-# resource "google_pubsub_topic_iam_member" "billing_publisher" {
-#   topic = google_pubsub_topic.budget_alert_topic.name
-#   role  = "roles/pubsub.publisher"
-
-#   # Cloud Billing 固有のサービスアカウント
-#   member = "serviceAccount:service-${var.project_number}@gcp-sa-cloudbilling.iam.gserviceaccount.com"
-# }
-
 # デッドレター用トピック（エラーになったメッセージの墓場）
 resource "google_pubsub_topic" "budget_alert_dead_letter" {
   name    = "budget-alert-dead-letter"
