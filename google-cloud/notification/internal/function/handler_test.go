@@ -2,7 +2,6 @@ package function
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"testing"
 
@@ -30,10 +29,9 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 			"currencyCode":           "USD",
 		}
 		jsonData, _ := json.Marshal(alertData)
-		base64Data := base64.StdEncoding.EncodeToString(jsonData)
 
 		message := PubSubMessage{
-			Data: []byte(base64Data),
+			Data: jsonData,
 		}
 
 		// Execute
@@ -59,7 +57,8 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 		handler := NewBudgetAlertHandler(mockSlack, cfg)
 
 		message := PubSubMessage{
-			Data: []byte("invalid-base64!!!"),
+			// JSONとして不正なデータを入れる
+			Data: []byte("invalid-json-data"),
 		}
 
 		// Execute
@@ -88,10 +87,9 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 			"currencyCode":      "USD",
 		}
 		jsonData, _ := json.Marshal(alertData)
-		base64Data := base64.StdEncoding.EncodeToString(jsonData)
 
 		message := PubSubMessage{
-			Data: []byte(base64Data),
+			Data: jsonData,
 		}
 
 		// Execute
@@ -133,13 +131,14 @@ func TestProcessBudgetAlertHTTP(t *testing.T) {
 			"currencyCode":      "USD",
 		}
 		jsonData, _ := json.Marshal(alertData)
-		base64Data := base64.StdEncoding.EncodeToString(jsonData)
 
 		httpReq := HTTPRequest{
 			Message: PubSubMessage{
-				Data: []byte(base64Data),
+				Data: jsonData,
 			},
 		}
+
+		// ここで `requestBody` は {"message": {"data": "Base64文字列..."}} に自動でなる
 		requestBody, _ := json.Marshal(httpReq)
 
 		// 環境変数をセット（開発環境）

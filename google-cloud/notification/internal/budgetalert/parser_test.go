@@ -1,7 +1,6 @@
 package budgetalert
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"testing"
 
@@ -19,10 +18,9 @@ func TestParsePubSubMessage(t *testing.T) {
 			"currencyCode":           "USD",
 		}
 		jsonData, _ := json.Marshal(alertData)
-		base64Data := base64.StdEncoding.EncodeToString(jsonData)
 
 		// Execute
-		alert, err := ParsePubSubMessage(base64Data)
+		alert, err := ParsePubSubMessage(jsonData)
 
 		// Assert
 		assert.NoError(t, err)
@@ -34,26 +32,12 @@ func TestParsePubSubMessage(t *testing.T) {
 		assert.Equal(t, "USD", alert.CurrencyCode)
 	})
 
-	t.Run("Base64デコードに失敗した場合、エラーが返される", func(t *testing.T) {
-		// Setup: 不正なBase64文字列
-		invalidBase64 := "これは不正なBase64です!!!"
-
-		// Execute
-		alert, err := ParsePubSubMessage(invalidBase64)
-
-		// Assert
-		assert.Error(t, err)
-		assert.Nil(t, alert)
-		assert.Contains(t, err.Error(), "failed to decode base64")
-	})
-
 	t.Run("JSONパースに失敗した場合、エラーが返される", func(t *testing.T) {
-		// Setup: 不正なJSONをBase64エンコード
-		invalidJSON := "これは不正なJSONです"
-		base64Data := base64.StdEncoding.EncodeToString([]byte(invalidJSON))
+		// Setup: 不正なJSONデータ（バイト列）
+		invalidJSON := []byte("これは不正なJSONです")
 
 		// Execute
-		alert, err := ParsePubSubMessage(base64Data)
+		alert, err := ParsePubSubMessage(invalidJSON)
 
 		// Assert
 		assert.Error(t, err)
@@ -61,13 +45,15 @@ func TestParsePubSubMessage(t *testing.T) {
 		assert.Contains(t, err.Error(), "failed to parse JSON")
 	})
 
-	t.Run("空の文字列の場合、エラーが返される", func(t *testing.T) {
+	t.Run("空のデータの場合、エラーが返される", func(t *testing.T) {
 		// Execute
-		alert, err := ParsePubSubMessage("")
+		// nilまたは空のバイトスライスを渡す
+		alert, err := ParsePubSubMessage(nil)
 
 		// Assert
 		assert.Error(t, err)
 		assert.Nil(t, alert)
+		assert.Contains(t, err.Error(), "empty message data")
 	})
 
 	t.Run("必須フィールドが欠けている場合でも、パース可能な部分は取得できる", func(t *testing.T) {
@@ -77,10 +63,9 @@ func TestParsePubSubMessage(t *testing.T) {
 			"costAmount":        300.0,
 		}
 		jsonData, _ := json.Marshal(alertData)
-		base64Data := base64.StdEncoding.EncodeToString(jsonData)
 
 		// Execute
-		alert, err := ParsePubSubMessage(base64Data)
+		alert, err := ParsePubSubMessage(jsonData)
 
 		// Assert
 		assert.NoError(t, err)
