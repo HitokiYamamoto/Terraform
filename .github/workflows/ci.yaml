@@ -2,6 +2,8 @@ name: Terraform
 
 on:
   push:
+    branches-ignore:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -93,6 +95,9 @@ jobs:
       - format-check
       - lint
       - security-scan
+    concurrency:
+      group: terraform-plan
+      cancel-in-progress: true
     permissions:
       contents: read
       id-token: write

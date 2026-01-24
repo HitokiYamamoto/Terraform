@@ -10,6 +10,9 @@ jobs:
   terraform-apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
+    concurrency:
+      group: terraform-apply
+      cancel-in-progress: true
     permissions:
       contents: read
       id-token: write
