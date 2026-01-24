@@ -5,6 +5,11 @@ locals {
     "roles/storage.objectViewer",
     "roles/cloudbuild.builds.builder",
   ]
+
+  secrets = ({
+    SLACK_BOT_USER_OAUTH_TOKEN = module.slack_channel_name.secret_id,
+    CHANNEL_NAME               = module.slack_oauth_token.secret_id,
+  })
 }
 
 # サービスアカウントにビルド時に必要な権限を付与
@@ -85,6 +90,26 @@ resource "google_artifact_registry_repository" "function_repo" {
   }
 }
 
+module "slack_oauth_token" {
+  source    = "../modules/secret_manager"
+  secret_id = "slack-bot-user-oauth-token"
+}
+
+module "slack_channel_name" {
+  source    = "../modules/secret_manager"
+  secret_id = "slack-channel-name"
+}
+
+# roles/secretmanager.secretAccessor
+resource "google_secret_manager_secret_iam_binding" "secret_accessor" {
+  for_each  = local.secrets
+  secret_id = each.value
+  role      = "roles/secretmanager.secretAccessor"
+  members = [
+    module.service_account.member
+  ]
+}
+
 resource "google_cloudfunctions2_function" "function" {
   name        = "budget-alert-function"
   location    = "us-central1"
@@ -115,6 +140,16 @@ resource "google_cloudfunctions2_function" "function" {
     timeout_seconds       = 60
     service_account_email = module.service_account.email
     ingress_settings      = "ALLOW_ALL" # セキュリティ強化のため内部トラフィックのみ許可
+
+    dynamic "secret_environment_variables" {
+      for_each = local.secrets
+      content {
+        key        = secret_environment_variables.key
+        secret     = secret_environment_variables.value
+        project_id = var.project_id
+        version    = "latest"
+      }
+    }
   }
 }
 

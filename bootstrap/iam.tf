@@ -6,6 +6,7 @@ locals {
     "roles/cloudfunctions.admin",
     "roles/resourcemanager.projectIamAdmin", # プロジェクトレベルのIAMポリシーを変更する権限
     "roles/pubsub.admin",
+    "roles/secretmanager.admin",
   ]
   # dataリソースで取得したいサービスアカウント名のリスト
   target_service_account_names = [
