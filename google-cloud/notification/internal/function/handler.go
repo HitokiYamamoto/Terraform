@@ -8,12 +8,12 @@ import (
 
 	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/budgetalert"
 	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/config"
-	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/secret"
 	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/slack"
 )
 
 // PubSubMessage はPub/Subから受け取るメッセージの構造
 type PubSubMessage struct {
+	// JSON Unmarshal時に自動的にBase64デコードされるため、[]byteで受ける
 	Data []byte `json:"data"`
 }
 
@@ -33,8 +33,9 @@ func NewBudgetAlertHandler(slackClient slack.Client, cfg *config.Config) *Budget
 
 // HandleBudgetAlert は予算アラートを処理する
 func (h *BudgetAlertHandler) HandleBudgetAlert(ctx context.Context, message PubSubMessage) error {
-	// Pub/Subメッセージをパース
-	alert, err := budgetalert.ParsePubSubMessage(string(message.Data))
+	// string変換せず、[]byteのまま渡す
+	// budgetalert.ParsePubSubMessage(data []byte) に合わせる
+	alert, err := budgetalert.ParsePubSubMessage(message.Data)
 	if err != nil {
 		return fmt.Errorf("failed to parse pubsub message: %w", err)
 	}
@@ -51,43 +52,18 @@ func (h *BudgetAlertHandler) HandleBudgetAlert(ctx context.Context, message PubS
 	return nil
 }
 
-// ProcessBudgetAlert はCloud Functions用のエントリーポイント
+// ProcessBudgetAlertはCloud Functions用のエントリーポイント
 func ProcessBudgetAlert(ctx context.Context, m PubSubMessage) error {
-	// 設定を読み込む
+	// 1. 設定を読み込む (内部で os.Getenv を実行)
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	var token string
+	// 2. Slackクライアントを作成 (ConfigからTokenを取得)
+	slackClient := slack.NewClient(cfg.SlackToken)
 
-	if cfg.IsDev() {
-		// 開発環境: 設定から直接取得
-		token = cfg.SlackToken
-	} else {
-		// 本番環境: Secret Managerから取得
-		secretMgr, err := secret.NewManager(ctx, cfg.ProjectID)
-		if err != nil {
-			return fmt.Errorf("failed to create secret manager: %w", err)
-		}
-		defer secretMgr.Close()
-
-		token, err = secretMgr.GetSecret(ctx, "SLACK_BOT_USER_OAUTH_TOKEN")
-		if err != nil {
-			return fmt.Errorf("failed to get slack token: %w", err)
-		}
-
-		channelName, err := secretMgr.GetSecret(ctx, "CHANNEL_NAME")
-		if err != nil {
-			return fmt.Errorf("failed to get channel name: %w", err)
-		}
-		cfg.ChannelName = channelName
-	}
-
-	// Slackクライアントを作成
-	slackClient := slack.NewClient(token)
-
-	// ハンドラーを作成して処理
+	// 3. ハンドラーを作成して処理
 	handler := NewBudgetAlertHandler(slackClient, cfg)
 	return handler.HandleBudgetAlert(ctx, m)
 }

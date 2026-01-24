@@ -1,7 +1,6 @@
 package budgetalert
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 )
@@ -15,31 +14,25 @@ type pubSubMessageData struct {
 	CurrencyCode           string  `json:"currencyCode"`
 }
 
-// ParsePubSubMessage はBase64エンコードされたPub/Subメッセージをパースする
-func ParsePubSubMessage(base64Data string) (*BudgetAlert, error) {
-	if base64Data == "" {
+// ParsePubSubMessage はPub/Subメッセージ(JSONバイト列)をパースする
+func ParsePubSubMessage(data []byte) (*BudgetAlert, error) {
+	if len(data) == 0 {
 		return nil, fmt.Errorf("empty message data")
 	}
 
-	// Base64デコード
-	decoded, err := base64.StdEncoding.DecodeString(base64Data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode base64: %w", err)
-	}
-
 	// JSONパース
-	var data pubSubMessageData
-	if err := json.Unmarshal(decoded, &data); err != nil {
+	var msgData pubSubMessageData
+	if err := json.Unmarshal(data, &msgData); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON: %w", err)
 	}
 
 	// BudgetAlertに変換
 	alert := &BudgetAlert{
-		BudgetDisplayName: data.BudgetDisplayName,
-		AlertThreshold:    data.AlertThresholdExceeded,
-		CostAmount:        data.CostAmount,
-		BudgetAmount:      data.BudgetAmount,
-		CurrencyCode:      data.CurrencyCode,
+		BudgetDisplayName: msgData.BudgetDisplayName,
+		AlertThreshold:    msgData.AlertThresholdExceeded,
+		CostAmount:        msgData.CostAmount,
+		BudgetAmount:      msgData.BudgetAmount,
+		CurrencyCode:      msgData.CurrencyCode,
 	}
 
 	return alert, nil
