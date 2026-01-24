@@ -12,6 +12,13 @@ gcloud-login:
 # terraform commands
 terraform +args:
     docker compose run --rm terraform \
+        terraform -chdir=bootstrap {{ args }}
+
+# terraform commands with service account impersonation
+terraform-impersonate service_account +args:
+    docker compose run --rm \
+        --env GOOGLE_IMPERSONATE_SERVICE_ACCOUNT={{ service_account }} \
+        terraform \
         terraform -chdir=google-cloud {{ args }}
 
 # terraform fmt
