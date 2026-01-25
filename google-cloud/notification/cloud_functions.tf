@@ -29,6 +29,10 @@ resource "google_cloudfunctions2_function" "function" {
     service_account_email = module.service_account.email
     ingress_settings      = "ALLOW_ALL" # セキュリティ強化のため内部トラフィックのみ許可
 
+    environment_variables = {
+      GOOGLE_CLOUD_PROJECT = var.project_id
+    }
+
     dynamic "secret_environment_variables" {
       for_each = local.secrets
       content {
