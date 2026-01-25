@@ -84,7 +84,7 @@ func (h *BudgetAlertHandler) HandleBudgetAlert(ctx context.Context, message PubS
 	now := time.Now()
 	if now.Sub(state.LastHeartbeat) > 7*24*time.Hour {
 		shouldNotify = true
-		notificationNote = "\n(System Heartbeat: 正常稼働中)"
+		notificationNote = "*💓 週次のパイプライン生存確認*\n"
 		state.LastHeartbeat = now
 	}
 
@@ -103,8 +103,8 @@ func (h *BudgetAlertHandler) HandleBudgetAlert(ctx context.Context, message PubS
 	slackMessage := budgetalert.FormatSlackMessage(alert)
 
 	if notificationNote != "" {
-		log.Println("💓 生存確認(Heartbeat)として通知を送信します。")
-		slackMessage += notificationNote
+		log.Println("💓 週次のパイプライン生存確認として通知を送信します。")
+		slackMessage = notificationNote + "\n" + slackMessage
 	}
 
 	if err := h.slackClient.PostMessage(h.cfg.ChannelName, slackMessage); err != nil {
