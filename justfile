@@ -45,11 +45,25 @@ prettier:
 yamllint:
     docker compose run --rm yamllint .
 
+# Golangのタスク実行(default: task list)
 task +args="":
     docker compose run --rm golang \
         task {{ args }}
 
+# Golangのユニットテスト実行
 test:
     docker compose up firestore --detach
     docker compose run --rm golang task test
     docker compose down
+
+# 予算アラートのテストメッセージをPub/Subに発行
+budget-publish-test:
+    docker compose run --rm terraform \
+        gcloud pubsub topics publish budget-alert-topic \
+        --message='{ \
+            "budgetDisplayName": "テスト予算アラート", \
+            "alertThresholdExceeded": 0.0, \
+            "costAmount": 0, \
+            "budgetAmount": 10000, \
+            "currencyCode": "JPY", \
+        }'
