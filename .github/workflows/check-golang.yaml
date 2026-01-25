@@ -19,6 +19,8 @@ jobs:
 
       - name: Setup Go and Task
         uses: ./.github/actions/setup-go-task
+        with:
+          working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Run Lint Task
         working-directory: ${{ env.WORKING_DIRECTORY }}
@@ -32,6 +34,8 @@ jobs:
 
       - name: Setup Go and Task
         uses: ./.github/actions/setup-go-task
+        with:
+          working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Run Test Task
         working-directory: ${{ env.WORKING_DIRECTORY }}
@@ -45,6 +49,8 @@ jobs:
 
       - name: Setup Go and Task
         uses: ./.github/actions/setup-go-task
+        with:
+          working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Run Format Check Task
         working-directory: ${{ env.WORKING_DIRECTORY }}
