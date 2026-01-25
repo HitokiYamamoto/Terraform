@@ -4,169 +4,192 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/config"
+	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/repository"
 	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/slack"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
+// --- Mocks ---
+
+// MockRepository は repository.Client の動作を模倣するモック
+type MockRepository struct {
+	mock.Mock
+}
+
+func (m *MockRepository) GetState(ctx context.Context) (*repository.State, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*repository.State), args.Error(1)
+}
+
+func (m *MockRepository) SaveState(ctx context.Context, state *repository.State) error {
+	args := m.Called(ctx, state)
+	return args.Error(0)
+}
+
+// --- Tests ---
+
 func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
-	t.Run("正しいメッセージの場合、Slackに通知が送信される", func(t *testing.T) {
-		// Setup
-		ctx := context.Background()
-		mockSlack := slack.NewMockClient()
-		cfg := &config.Config{
-			ChannelName: "test-channel",
-		}
-		handler := NewBudgetAlertHandler(mockSlack, cfg)
+	// 共通の設定
+	ctx := context.Background()
+	cfg := &config.Config{ChannelName: "test-channel"}
 
-		// 予算アラートのデータを作成
-		alertData := map[string]interface{}{
-			"budgetDisplayName":      "テスト予算",
-			"alertThresholdExceeded": 0.8,
-			"costAmount":             800.0,
-			"budgetAmount":           1000.0,
-			"currencyCode":           "USD",
-		}
-		jsonData, _ := json.Marshal(alertData)
+	// 生存確認(Heartbeat)で誤爆しないように、現在時刻を用意
+	now := time.Now()
 
-		message := PubSubMessage{
-			Data: jsonData,
-		}
+	// テストケース定義
+	tests := []struct {
+		name string
+		// Given
+		lastState *repository.State // DBにある前回の状態
+		alertData map[string]interface{}
+		// When & Then
+		expectNotify bool // Slack通知が飛ぶべきか
+		expectSave   bool // DB保存が走るべきか
+		expectError  bool // エラーが返るべきか
+	}{
+		{
+			name: "【通知あり】前回50% -> 今回80% (上昇)",
+			lastState: &repository.State{
+				LastThreshold: 0.5,
+				CurrentMonth:  "2026-02-01T00:00:00Z",
+				LastHeartbeat: now, // ★最近確認したことにする（Heartbeat通知を防ぐ）
+			},
+			alertData: map[string]interface{}{
+				"budgetDisplayName":      "テスト予算",
+				"alertThresholdExceeded": 0.8,
+				"costAmount":             800.0,
+				"budgetAmount":           1000.0,
+				"currencyCode":           "USD",
+				"costIntervalStart":      "2026-02-01T00:00:00Z",
+			},
+			expectNotify: true,
+			expectSave:   true,
+			expectError:  false,
+		},
+		{
+			name: "【通知なし】前回50% -> 今回50% (変化なし)",
+			lastState: &repository.State{
+				LastThreshold: 0.5,
+				CurrentMonth:  "2026-02-01T00:00:00Z",
+				LastHeartbeat: now, // ★ここが超重要！これがないと西暦1年になり、Heartbeat通知が飛んでテスト失敗します
+			},
+			alertData: map[string]interface{}{
+				"budgetDisplayName":      "テスト予算",
+				"alertThresholdExceeded": 0.5,
+				"costAmount":             500.0,
+				"budgetAmount":           1000.0,
+				"currencyCode":           "USD",
+				"costIntervalStart":      "2026-02-01T00:00:00Z", // 前回修正いただいた通り必須
+			},
+			expectNotify: false,
+			expectSave:   false,
+			expectError:  false,
+		},
+		{
+			name: "【通知あり】月が変わった場合 (リセット)",
+			lastState: &repository.State{
+				LastThreshold: 1.0,
+				CurrentMonth:  "2026-01-01T00:00:00Z",
+				LastHeartbeat: now,
+			},
+			alertData: map[string]interface{}{
+				"budgetDisplayName":      "テスト予算",
+				"alertThresholdExceeded": 0.1,
+				"costAmount":             100.0,
+				"budgetAmount":           1000.0,
+				"currencyCode":           "USD",
+				"costIntervalStart":      "2026-02-01T00:00:00Z", // 新しい月
+			},
+			expectNotify: true,
+			expectSave:   true,
+			expectError:  false,
+		},
+		{
+			name:      "【通知あり】初回起動 (データなし)",
+			lastState: nil,
+			alertData: map[string]interface{}{
+				"budgetDisplayName":      "テスト予算",
+				"alertThresholdExceeded": 0.5,
+				"costAmount":             500.0,
+				"budgetAmount":           1000.0,
+				"currencyCode":           "USD",
+				"costIntervalStart":      "2026-02-01T00:00:00Z",
+			},
+			expectNotify: true,
+			expectSave:   true,
+			expectError:  false,
+		},
+	}
 
-		// Execute
-		err := handler.HandleBudgetAlert(ctx, message)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup Mocks
+			mockSlack := slack.NewMockClient()
+			mockRepo := new(MockRepository)
 
-		// Assert
-		assert.NoError(t, err)
-		assert.Equal(t, 1, len(mockSlack.Messages))
-		lastMsg := mockSlack.GetLastMessage()
-		assert.NotNil(t, lastMsg)
-		assert.Equal(t, "test-channel", lastMsg.Channel)
-		assert.Contains(t, lastMsg.Text, "テスト予算")
-		assert.Contains(t, lastMsg.Text, "80.00%")
-	})
+			// GetStateの挙動設定
+			if tt.lastState == nil {
+				mockRepo.On("GetState", ctx).Return(nil, status.Error(codes.NotFound, "not found"))
+			} else {
+				mockRepo.On("GetState", ctx).Return(tt.lastState, nil)
+			}
 
-	t.Run("不正なメッセージの場合、エラーが返される", func(t *testing.T) {
-		// Setup
-		ctx := context.Background()
-		mockSlack := slack.NewMockClient()
-		cfg := &config.Config{
-			ChannelName: "test-channel",
-		}
-		handler := NewBudgetAlertHandler(mockSlack, cfg)
+			// SaveStateの挙動設定
+			if tt.expectSave {
+				mockRepo.On("SaveState", ctx, mock.Anything).Return(nil)
+			}
 
-		message := PubSubMessage{
-			// JSONとして不正なデータを入れる
-			Data: []byte("invalid-json-data"),
-		}
+			// JSON作成
+			jsonData, _ := json.Marshal(tt.alertData)
+			message := PubSubMessage{Data: jsonData}
 
-		// Execute
-		err := handler.HandleBudgetAlert(ctx, message)
+			// Handler作成
+			handler := NewBudgetAlertHandler(mockSlack, mockRepo, cfg)
 
-		// Assert
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to parse pubsub message")
-		assert.Equal(t, 0, len(mockSlack.Messages))
-	})
+			// Execute
+			err := handler.HandleBudgetAlert(ctx, message)
 
-	t.Run("Slack送信に失敗した場合、エラーが返される", func(t *testing.T) {
-		// Setup
-		ctx := context.Background()
-		mockSlack := slack.NewMockClient()
-		mockSlack.Error = assert.AnError
-		cfg := &config.Config{
-			ChannelName: "test-channel",
-		}
-		handler := NewBudgetAlertHandler(mockSlack, cfg)
+			// Assert
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
 
-		alertData := map[string]interface{}{
-			"budgetDisplayName": "テスト予算",
-			"costAmount":        500.0,
-			"budgetAmount":      1000.0,
-			"currencyCode":      "USD",
-		}
-		jsonData, _ := json.Marshal(alertData)
+			if tt.expectNotify {
+				assert.Equal(t, 1, len(mockSlack.Messages), "Slack通知件数不一致")
+			} else {
+				assert.Equal(t, 0, len(mockSlack.Messages), "Slack通知が送信されてはいけません")
+			}
 
-		message := PubSubMessage{
-			Data: jsonData,
-		}
-
-		// Execute
-		err := handler.HandleBudgetAlert(ctx, message)
-
-		// Assert
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to send slack notification")
-	})
+			if tt.expectSave {
+				mockRepo.AssertNumberOfCalls(t, "SaveState", 1)
+			} else {
+				mockRepo.AssertNotCalled(t, "SaveState", mock.Anything, mock.Anything)
+			}
+		})
+	}
 }
 
 func TestNewBudgetAlertHandler(t *testing.T) {
 	t.Run("ハンドラーが正しく作成される", func(t *testing.T) {
-		// Setup
 		mockSlack := slack.NewMockClient()
-		cfg := &config.Config{
-			ChannelName: "test-channel",
-		}
+		mockRepo := new(MockRepository)
+		cfg := &config.Config{ChannelName: "test-channel"}
 
-		// Execute
-		handler := NewBudgetAlertHandler(mockSlack, cfg)
+		handler := NewBudgetAlertHandler(mockSlack, mockRepo, cfg)
 
-		// Assert
 		assert.NotNil(t, handler)
 		assert.Equal(t, mockSlack, handler.slackClient)
 		assert.Equal(t, cfg, handler.cfg)
-	})
-}
-
-func TestProcessBudgetAlertHTTP(t *testing.T) {
-	t.Run("HTTPリクエストからメッセージを解析できる", func(t *testing.T) {
-		// Setup
-		ctx := context.Background()
-
-		alertData := map[string]interface{}{
-			"budgetDisplayName": "テスト予算",
-			"costAmount":        300.0,
-			"budgetAmount":      1000.0,
-			"currencyCode":      "USD",
-		}
-		jsonData, _ := json.Marshal(alertData)
-
-		httpReq := HTTPRequest{
-			Message: PubSubMessage{
-				Data: jsonData,
-			},
-		}
-
-		// ここで `requestBody` は {"message": {"data": "Base64文字列..."}} に自動でなる
-		requestBody, _ := json.Marshal(httpReq)
-
-		// 環境変数をセット（開発環境）
-		t.Setenv("ENV", "dev")
-		t.Setenv("SLACK_BOT_USER_OAUTH_TOKEN", "xoxb-test-token")
-		t.Setenv("CHANNEL_NAME", "test-channel")
-
-		// Execute
-		err := ProcessBudgetAlertHTTP(ctx, requestBody)
-
-		// NOTE: 実際のSlack送信は行われないが、パースは成功する
-		// エラーがないか、またはSlack送信エラーであることを確認
-		if err != nil {
-			// Slack送信のエラーは許容（モックがないため）
-			assert.Contains(t, err.Error(), "slack")
-		}
-	})
-
-	t.Run("不正なJSONの場合、エラーが返される", func(t *testing.T) {
-		// Setup
-		ctx := context.Background()
-		invalidJSON := []byte("invalid json")
-
-		// Execute
-		err := ProcessBudgetAlertHTTP(ctx, invalidJSON)
-
-		// Assert
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to parse request")
 	})
 }

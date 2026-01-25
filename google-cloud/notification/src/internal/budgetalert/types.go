@@ -7,6 +7,7 @@ type BudgetAlert struct {
 	CostAmount        float64 // 現在のコスト
 	BudgetAmount      float64 // 予算額
 	CurrencyCode      string  // 通貨コード（USD, JPYなど）
+	CostIntervalStart string  // 例: "2026-01-01T00:00:00Z"
 }
 
 // UsagePercentage は予算の使用率を計算する（0-100の範囲）

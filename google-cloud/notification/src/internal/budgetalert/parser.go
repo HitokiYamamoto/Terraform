@@ -12,6 +12,7 @@ type pubSubMessageData struct {
 	CostAmount             float64 `json:"costAmount"`
 	BudgetAmount           float64 `json:"budgetAmount"`
 	CurrencyCode           string  `json:"currencyCode"`
+	CostIntervalStart      string  `json:"costIntervalStart"`
 }
 
 // ParsePubSubMessage はPub/Subメッセージ(JSONバイト列)をパースする
@@ -33,6 +34,7 @@ func ParsePubSubMessage(data []byte) (*BudgetAlert, error) {
 		CostAmount:        msgData.CostAmount,
 		BudgetAmount:      msgData.BudgetAmount,
 		CurrencyCode:      msgData.CurrencyCode,
+		CostIntervalStart: msgData.CostIntervalStart,
 	}
 
 	return alert, nil
