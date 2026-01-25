@@ -36,8 +36,31 @@ services:
     build:
       context: ./docker/build
       dockerfile: Dockerfile.golang
+    environment:
+      - FIRESTORE_EMULATOR_HOST=firestore:8080
+      - DATASTORE_EMULATOR_HOST=firestore:8080
+      - GOOGLE_CLOUD_PROJECT=dummy-project-id
+    networks:
+      - local-db
     volumes:
       - type: bind
         source: ./google-cloud/notification/src
         target: /home/go/app
     working_dir: /home/go/app
+
+  firestore:
+    build:
+      context: ./docker/build
+      dockerfile: Dockerfile.firestore
+    volumes:
+      - type: bind
+        source: ./docker/bind/gcloud
+        target: /home/firestore/.config/gcloud
+    networks:
+      - local-db
+    ports:
+      - "8080:8080"
+    command: gcloud emulators firestore start --host-port=0.0.0.0:8080
+
+networks:
+  local-db:

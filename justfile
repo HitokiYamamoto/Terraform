@@ -48,3 +48,8 @@ yamllint:
 task +args="":
     docker compose run --rm golang \
         task {{ args }}
+
+test:
+    docker compose up firestore --detach
+    docker compose run --rm golang task test
+    docker compose down
