@@ -1,4 +1,4 @@
-module github.com/HitokiYamamoto/Terraform/google-cloud/notification
+module github.com/HitokiYamamoto/Terraform/google-cloud/notification/src
 
 go 1.24.0
 

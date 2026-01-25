@@ -9,7 +9,7 @@ tasks:
   init:
     desc: "Goモジュールを初期化"
     cmds:
-      - go mod init github.com/HitokiYamamoto/Terraform/google-cloud/notification
+      - go mod init github.com/HitokiYamamoto/Terraform/google-cloud/src/notification
     status:
       - test -f go.mod # go.modが存在しない場合にのみ実行
 

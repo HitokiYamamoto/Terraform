@@ -4,7 +4,7 @@ package notification
 import (
 	"context"
 
-	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/function"
+	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/function"
 )
 
 // ProcessBudgetAlert はCloud Functions用のエントリーポイント

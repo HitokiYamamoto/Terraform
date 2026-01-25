@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/config"
-	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/slack"
+	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/config"
+	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/slack"
 )
 
 func main() {

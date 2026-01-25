@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/budgetalert"
-	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/config"
-	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/internal/slack"
+	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/budgetalert"
+	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/config"
+	"github.com/HitokiYamamoto/Terraform/google-cloud/notification/src/internal/slack"
 )
 
 // PubSubMessage はPub/Subから受け取るメッセージの構造
