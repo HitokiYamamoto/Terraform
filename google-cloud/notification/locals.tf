@@ -4,6 +4,7 @@ locals {
     "roles/artifactregistry.writer",
     "roles/storage.objectViewer",
     "roles/cloudbuild.builds.builder",
+    "roles/datastore.user",
   ]
 
   secrets = ({
