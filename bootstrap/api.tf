@@ -8,6 +8,7 @@ locals {
     "run.googleapis.com",                  # Cloud Run Admin API
     "cloudresourcemanager.googleapis.com", # Cloud Resource Manager API
     "eventarc.googleapis.com",             # Eventarc API
+    "firestore.googleapis.com",            # Firestore API
     "iamcredentials.googleapis.com",       # IAM Service Account Credentials API
     "iam.googleapis.com",                  # Identity and Access Management (IAM) API
     "pubsub.googleapis.com",               # Pub/Sub API
