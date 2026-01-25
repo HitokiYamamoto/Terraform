@@ -38,6 +38,6 @@ services:
       dockerfile: Dockerfile.golang
     volumes:
       - type: bind
-        source: ./google-cloud/notification
+        source: ./google-cloud/notification/src
         target: /home/go/app
     working_dir: /home/go/app

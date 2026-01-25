@@ -36,7 +36,7 @@ module "cloud_storage" {
 # Cloud Functionsはルートディレクトリにgo.modとエントリーポイントが必要
 data "archive_file" "function_source" {
   type        = "zip"
-  source_dir  = path.module
+  source_dir  = "${path.module}/src"
   output_path = "${path.module}/function_source.zip"
 
   # Cloud Functionsが期待しない不要なファイルを除外

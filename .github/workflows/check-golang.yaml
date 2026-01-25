@@ -3,9 +3,12 @@ name: Check Go Files
 on:
   push:
     paths:
-      - "google-cloud/notification/**"
+      - "google-cloud/notification/src/**"
     branches-ignore:
       - main
+
+env:
+  WORKING_DIRECTORY: google-cloud/notification/src
 
 jobs:
   lint:
@@ -18,7 +21,7 @@ jobs:
         uses: ./.github/actions/setup-go-task
 
       - name: Run Lint Task
-        working-directory: google-cloud/notification
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: task lint-check
 
   test:
@@ -31,7 +34,7 @@ jobs:
         uses: ./.github/actions/setup-go-task
 
       - name: Run Test Task
-        working-directory: google-cloud/notification
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: task test
 
   format-check:
@@ -44,5 +47,5 @@ jobs:
         uses: ./.github/actions/setup-go-task
 
       - name: Run Format Check Task
-        working-directory: google-cloud/notification
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: task format-check
