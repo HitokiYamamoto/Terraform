@@ -11,6 +11,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// テストで使用する固定のドキュメントID
+const testDocID = "test-budget-item"
+
 type FirestoreTestSuite struct {
 	suite.Suite
 	client *Client
@@ -33,46 +36,44 @@ func (s *FirestoreTestSuite) TearDownSuite() {
 	}
 }
 
-// テスト実行ごとにDBをきれいにする（テーブル駆動ループ内の干渉を防ぐため）
+// テスト実行ごとにDBをきれいにする
 func (s *FirestoreTestSuite) clearDB() {
-	_, err := s.client.fs.Collection("billing_notifications").Doc("state").Delete(s.ctx)
-	s.Require().NoError(err)
+	// ★修正: 未定義だった docID の代わりに、定数 testDocID を使用
+	_, err := s.client.fs.Collection("billing_notifications").Doc(testDocID).Delete(s.ctx)
+	// ドキュメントが存在しない場合の削除エラーは無視して良いが、
+	// Firestoreのエミュレータの挙動としてDeleteは成功扱いになるはず
+	if err != nil && status.Code(err) != codes.NotFound {
+		s.Require().NoError(err)
+	}
 }
 
 func (s *FirestoreTestSuite) TestRepository_Scenarios() {
-	// 固定の日時（テスト用）
 	fixedTime := time.Date(2026, 2, 1, 10, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		name string // テストケース名
-
-		// Given: テスト実行前のDBの状態を作る関数
-		setup func()
-
-		// When: 検証したい操作を実行する関数 (戻り値やエラーを返す)
-		act func() (*State, error)
-
-		// Then: アサーション (結果の検証)
+		name      string
+		setup     func()
+		act       func() (*State, error)
 		assertion func(got *State, err error)
 	}{
 		{
 			name: "【正常系】データが何もない場合、SaveStateすると、正しく保存される",
 			setup: func() {
-				s.clearDB() // 空にする
+				s.clearDB()
 			},
 			act: func() (*State, error) {
-				// 保存したいデータ
 				newState := &State{
 					LastThreshold: 0.5,
 					CurrentMonth:  "2026-02",
 					LastHeartbeat: fixedTime,
 				}
-				err := s.client.SaveState(s.ctx, newState)
+
+				err := s.client.SaveState(s.ctx, testDocID, newState)
 				if err != nil {
 					return nil, err
 				}
-				// 検証のためにGetして返す
-				return s.client.GetState(s.ctx)
+
+				return s.client.GetState(s.ctx, testDocID)
 			},
 			assertion: func(got *State, err error) {
 				s.Require().NoError(err)
@@ -85,18 +86,19 @@ func (s *FirestoreTestSuite) TestRepository_Scenarios() {
 			name: "【正常系】既にデータがある場合、SaveStateで上書きされる",
 			setup: func() {
 				s.clearDB()
-				// 事前に古いデータを入れておく
 				oldState := &State{LastThreshold: 0.2, CurrentMonth: "2026-01"}
-				s.client.SaveState(s.ctx, oldState)
+
+				s.client.SaveState(s.ctx, testDocID, oldState)
 			},
 			act: func() (*State, error) {
-				// 新しいデータで上書き
 				newState := &State{LastThreshold: 0.8, CurrentMonth: "2026-02"}
-				err := s.client.SaveState(s.ctx, newState)
+
+				err := s.client.SaveState(s.ctx, testDocID, newState)
 				if err != nil {
 					return nil, err
 				}
-				return s.client.GetState(s.ctx)
+
+				return s.client.GetState(s.ctx, testDocID)
 			},
 			assertion: func(got *State, err error) {
 				s.Require().NoError(err)
@@ -106,10 +108,11 @@ func (s *FirestoreTestSuite) TestRepository_Scenarios() {
 		{
 			name: "【異常系】データが存在しない場合、GetStateすると、NotFoundエラーになる",
 			setup: func() {
-				s.clearDB() // 完全に空にする
+				s.clearDB()
 			},
 			act: func() (*State, error) {
-				return s.client.GetState(s.ctx)
+
+				return s.client.GetState(s.ctx, testDocID)
 			},
 			assertion: func(got *State, err error) {
 				s.Assert().Error(err)
@@ -119,18 +122,12 @@ func (s *FirestoreTestSuite) TestRepository_Scenarios() {
 		},
 	}
 
-	// テーブル駆動実行ループ
 	for _, tt := range tests {
 		s.Run(tt.name, func() {
-			// 1. Given
 			if tt.setup != nil {
 				tt.setup()
 			}
-
-			// 2. When
 			got, err := tt.act()
-
-			// 3. Then
 			if tt.assertion != nil {
 				tt.assertion(got, err)
 			}

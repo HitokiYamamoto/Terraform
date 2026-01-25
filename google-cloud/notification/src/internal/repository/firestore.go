@@ -38,16 +38,16 @@ func (c *Client) Close() error {
 }
 
 // SaveState は状態を保存（作成または上書き）する
-func (c *Client) SaveState(ctx context.Context, state *State) error {
-	// コレクション名 "billing_notifications" と ドキュメントID "state" は固定
-	_, err := c.fs.Collection("billing_notifications").Doc("state").Set(ctx, state)
+func (c *Client) SaveState(ctx context.Context, docID string, state *State) error {
+	// コレクション名 "billing_notifications"、ドキュメントIDごとに保存
+	_, err := c.fs.Collection("billing_notifications").Doc(docID).Set(ctx, state)
 	return err
 }
 
 // GetState は状態を取得する
 // ドキュメントが存在しない場合、呼び出し元で codes.NotFound として判定できるエラーを返す
-func (c *Client) GetState(ctx context.Context) (*State, error) {
-	docSnap, err := c.fs.Collection("billing_notifications").Doc("state").Get(ctx)
+func (c *Client) GetState(ctx context.Context, docID string) (*State, error) {
+	docSnap, err := c.fs.Collection("billing_notifications").Doc(docID).Get(ctx)
 	if err != nil {
 		// ドキュメントがない場合、ここでエラーが返る（status code = NotFound）
 		// これをそのまま返すことで、テスト側のcodes.NotFound 判定が通る

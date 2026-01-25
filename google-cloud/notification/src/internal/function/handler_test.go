@@ -22,16 +22,16 @@ type MockRepository struct {
 	mock.Mock
 }
 
-func (m *MockRepository) GetState(ctx context.Context) (*repository.State, error) {
-	args := m.Called(ctx)
+func (m *MockRepository) GetState(ctx context.Context, id string) (*repository.State, error) {
+	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*repository.State), args.Error(1)
 }
 
-func (m *MockRepository) SaveState(ctx context.Context, state *repository.State) error {
-	args := m.Called(ctx, state)
+func (m *MockRepository) SaveState(ctx context.Context, id string, state *repository.State) error {
+	args := m.Called(ctx, id, state)
 	return args.Error(0)
 }
 
@@ -61,7 +61,7 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 			lastState: &repository.State{
 				LastThreshold: 0.5,
 				CurrentMonth:  "2026-02-01T00:00:00Z",
-				LastHeartbeat: now, // ★最近確認したことにする（Heartbeat通知を防ぐ）
+				LastHeartbeat: now,
 			},
 			alertData: map[string]interface{}{
 				"budgetDisplayName":      "テスト予算",
@@ -80,7 +80,7 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 			lastState: &repository.State{
 				LastThreshold: 0.5,
 				CurrentMonth:  "2026-02-01T00:00:00Z",
-				LastHeartbeat: now, // ★ここが超重要！これがないと西暦1年になり、Heartbeat通知が飛んでテスト失敗します
+				LastHeartbeat: now,
 			},
 			alertData: map[string]interface{}{
 				"budgetDisplayName":      "テスト予算",
@@ -88,7 +88,7 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 				"costAmount":             500.0,
 				"budgetAmount":           1000.0,
 				"currencyCode":           "USD",
-				"costIntervalStart":      "2026-02-01T00:00:00Z", // 前回修正いただいた通り必須
+				"costIntervalStart":      "2026-02-01T00:00:00Z",
 			},
 			expectNotify: false,
 			expectSave:   false,
@@ -107,7 +107,7 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 				"costAmount":             100.0,
 				"budgetAmount":           1000.0,
 				"currencyCode":           "USD",
-				"costIntervalStart":      "2026-02-01T00:00:00Z", // 新しい月
+				"costIntervalStart":      "2026-02-01T00:00:00Z",
 			},
 			expectNotify: true,
 			expectSave:   true,
@@ -138,14 +138,15 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 
 			// GetStateの挙動設定
 			if tt.lastState == nil {
-				mockRepo.On("GetState", ctx).Return(nil, status.Error(codes.NotFound, "not found"))
+				// mock.Anything（第2引数のIDはなんでも良いという意味）
+				mockRepo.On("GetState", ctx, mock.Anything).Return(nil, status.Error(codes.NotFound, "not found"))
 			} else {
-				mockRepo.On("GetState", ctx).Return(tt.lastState, nil)
+				mockRepo.On("GetState", ctx, mock.Anything).Return(tt.lastState, nil)
 			}
 
 			// SaveStateの挙動設定
 			if tt.expectSave {
-				mockRepo.On("SaveState", ctx, mock.Anything).Return(nil)
+				mockRepo.On("SaveState", ctx, mock.Anything, mock.Anything).Return(nil)
 			}
 
 			// JSON作成
@@ -174,7 +175,7 @@ func TestBudgetAlertHandler_HandleBudgetAlert(t *testing.T) {
 			if tt.expectSave {
 				mockRepo.AssertNumberOfCalls(t, "SaveState", 1)
 			} else {
-				mockRepo.AssertNotCalled(t, "SaveState", mock.Anything, mock.Anything)
+				mockRepo.AssertNotCalled(t, "SaveState", mock.Anything, mock.Anything, mock.Anything)
 			}
 		})
 	}
