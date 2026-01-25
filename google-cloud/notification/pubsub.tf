@@ -17,7 +17,7 @@ resource "google_pubsub_subscription" "budget_alert_subscription" {
 
   # Push設定：Cloud Functions (Cloud Run) のURLを叩く
   push_config {
-    push_endpoint = google_cloudfunctions2_function.function.service_config[0].uri
+    push_endpoint = "${google_cloudfunctions2_function.function.service_config[0].uri}/projects/${var.project_id}/topics/${google_pubsub_topic.budget_alert_topic.name}"
 
     # セキュリティ設定：このSAの権限を使って関数を叩く
     oidc_token {
