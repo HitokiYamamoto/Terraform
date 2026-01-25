@@ -37,7 +37,7 @@ module "cloud_storage" {
 data "archive_file" "function_source" {
   type        = "zip"
   source_dir  = "${path.module}/src"
-  output_path = "${path.module}/function_source.zip"
+  output_path = "${path.module}/src/function_source.zip"
 
   # Cloud Functionsが期待しない不要なファイルを除外
   excludes = [
@@ -45,9 +45,7 @@ data "archive_file" "function_source" {
     ".env",
     "bin/**",
     "Taskfile.yaml",
-    "*.tf",
-    "*.tfvars",
-    ".terraform/**",
+    "internal/**/*_test.go",
     "cmd/**", # ローカル開発用のcmdディレクトリは除外
   ]
 }
