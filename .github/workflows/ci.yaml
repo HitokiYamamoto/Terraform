@@ -116,7 +116,7 @@ jobs:
         with:
           terraform_version: 1.14.3
 
-      - name: Google Cloud認証
+      - name: Authenticate to Google Cloud
         uses: ./.github/actions/auth-google-cloud
 
       - name: Terraform Init
