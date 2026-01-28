@@ -37,9 +37,9 @@ trivy:
         --workdir /app \
         aquasec/trivy:0.68.2 fs --scanners config,vuln .
 
-# Prettier for YAML files
+# Prettier for YAML and JSON5 files
 prettier:
-    docker compose run --rm prettier --parser yaml --write "**/*.yaml"
+    docker compose run --rm prettier --write "**/*.yaml" "**/*.json5"
 
 # Lint check for YAML files
 yamllint:
