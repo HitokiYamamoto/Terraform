@@ -3,6 +3,7 @@
   extends: ["config:best-practices", ":disableDependencyDashboard"],
   labels: ["renovate"],
   customManagers: [
+    // Terraform Version
     {
       customType: "regex",
       managerFilePatterns: [
@@ -24,11 +25,32 @@
       depNameTemplate: "hashicorp/terraform",
       datasourceTemplate: "github-releases",
     },
+    // Golang Version
+    {
+      customType: "regex",
+      managerFilePatterns: [
+        "/^\\.github/workflows/.*\\.ya?ml$/",
+        "/^\\.github/actions/.*\\.ya?ml$/",
+      ],
+      matchStrings: [
+        "default:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?\\s*# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\b",
+      ],
+      depNameTemplate: "golang/go",
+      datasourceTemplate: "golang-version",
+    },
   ],
   packageRules: [
+    // Group Terraform version updates
     {
+      description: "Group Terraform version updates in GitHub Actions and Dockerfile",
       matchPackageNames: ["hashicorp/terraform", "terraform"],
       groupName: "Terraform Version",
+    },
+    // Group Go version updates
+    {
+      description: "Group Go updates in action.yml, Dockerfile, and go.mod",
+      matchPackageNames: ["go", "golang"],
+      groupName: "Go Ecosystem",
     },
   ],
 }
