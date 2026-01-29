@@ -52,7 +52,10 @@
     {
       customType: "regex",
       description: "CI Workflow TFLint version",
-      fileMatch: ["(^|/)\\.github/workflows/.*\\.ya?ml$"],
+      fileMatch: [
+        "/^\\.github/workflows/.*\\.ya?ml$/",
+        "/^\\.github/actions/.*\\.ya?ml$/",
+      ],
       matchStrings: [
         "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\b",
       ],
