@@ -17,7 +17,7 @@ services:
     working_dir: /home/terraform/workspace
 
   prettier:
-    image: tmknom/prettier
+    image: tmknom/prettier@sha256:31684fd957f78ddebd0fc003f2790da08bd7a41cfe1146912da43a114fbeebf9
     volumes:
       - type: bind
         source: .
@@ -25,7 +25,7 @@ services:
     working_dir: /workspace
 
   yamllint:
-    image: cytopia/yamllint
+    image: cytopia/yamllint@sha256:3e9eb827ab2b12a5ea5f49d4257bb3aca94bba9f1ba427c8bc7f2456385a5204
     volumes:
       - type: bind
         source: .
