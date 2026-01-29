@@ -85,7 +85,7 @@ jobs:
     name: Apply
     # 条件1: mainブランチ or 手動実行
     # 条件2: かつ、Planで差分があった場合のみ
-    if: ${{ github.ref_name == 'main' || github.event_name == 'workflow_dispatch' && needs.plan.outputs.has_changes == 'true' }}
+    if: ${{ (github.ref_name == 'main' || github.event_name == 'workflow_dispatch') && needs.plan.outputs.has_changes == 'true' }}
     needs: plan
     runs-on: ubuntu-latest
     permissions:
