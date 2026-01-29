@@ -3,81 +3,50 @@
   extends: ["config:best-practices", ":disableDependencyDashboard"],
   labels: ["renovate"],
   customManagers: [
-    // Terraform Version
     {
       customType: "regex",
-      managerFilePatterns: [
-        "/^\\.github/workflows/.*\\.ya?ml$/",
-        "/^\\.github/actions/.*\\.ya?ml$/",
+      description: "Comment-based updates for YAML",
+      fileMatch: [
+        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
+        "(^|/)action\\.ya?ml$",
       ],
+      matchStrings: [
+        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\b",
+      ],
+    },
+
+    {
+      customType: "regex",
+      fileMatch: ["(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$"],
       matchStrings: [
         "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "hashicorp/terraform",
       datasourceTemplate: "github-releases",
     },
+
     {
       customType: "regex",
-      managerFilePatterns: ["/(^|/)Dockerfile$/"],
+      fileMatch: ["(^|/)Dockerfile$"],
       matchStrings: [
-        "ENV TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>[\\d\\.]+)[\"']?",
+        "ENV\\s+(?<depName>[A-Z_]+)_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
-      depNameTemplate: "hashicorp/terraform",
+
+      depNameTemplate: "{{#if (eq depName 'TERRAFORM')}}hashicorp/terraform{{else if (eq depName 'TFLINT')}}terraform-linters/tflint{{else}}{{depName}}{{/if}}",
       datasourceTemplate: "github-releases",
-    },
-    // Golang Version
-    {
-      customType: "regex",
-      managerFilePatterns: [
-        "/^\\.github/workflows/.*\\.ya?ml$/",
-        "/^\\.github/actions/.*\\.ya?ml$/",
-      ],
-      matchStrings: [
-        "default:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?\\s*# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\b",
-      ],
-      depNameTemplate: "golang/go",
-      datasourceTemplate: "golang-version",
-    },
-    // TFLint Version
-    {
-      customType: "regex",
-      description: "Dockerfile TFLint version",
-      fileMatch: ["(^|/)Dockerfile.*$"],
-      matchStrings: [
-        "ENV TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
-      ],
-      depNameTemplate: "terraform-linters/tflint",
-      datasourceTemplate: "github-releases",
-    },
-    {
-      customType: "regex",
-      description: "CI Workflow TFLint version",
-      fileMatch: [
-        "/^\\.github/workflows/.*\\.ya?ml$/",
-        "/^\\.github/actions/.*\\.ya?ml$/",
-      ],
-      matchStrings: [
-        "default:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?\\s*# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\b",
-      ],
     },
   ],
   packageRules: [
-    // Group Terraform version updates
     {
-      description: "Group Terraform version updates in GitHub Actions and Dockerfile",
-      matchPackageNames: ["hashicorp/terraform", "terraform"],
+      matchPackagePatterns: ["terraform"],
       groupName: "Terraform Version",
     },
-    // Group Go version updates
     {
-      description: "Group Go updates in action.yml, Dockerfile, and go.mod",
-      matchPackageNames: ["go", "golang"],
+      matchPackagePatterns: ["^go$", "golang"],
       groupName: "Go Ecosystem",
     },
-    // Group TFLint updates
     {
-      description: "Group TFLint version updates in GitHub Actions and Dockerfile",
-      matchPackageNames: ["terraform-linters/tflint", "tflint"],
+      matchPackagePatterns: ["tflint"],
       groupName: "TFLint Version",
     },
   ],
