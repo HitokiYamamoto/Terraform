@@ -57,7 +57,7 @@
         "/^\\.github/actions/.*\\.ya?ml$/",
       ],
       matchStrings: [
-        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\b",
+        "default:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?\\s*# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\b",
       ],
     },
   ],
