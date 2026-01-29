@@ -1,0 +1,102 @@
+name: Terraform to Google Cloud CI/CD
+
+on:
+  workflow_call:
+
+concurrency:
+  group: terraform-global-lock
+  cancel-in-progress: false
+
+env:
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+  TF_VAR_project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
+  TF_VAR_project_number: ${{ secrets.GOOGLE_CLOUD_PROJECT_NUMBER }}
+  TF_VAR_billing_account_id: ${{ secrets.GOOGLE_CLOUD_BILLING_ACCOUNT }}
+
+jobs:
+  init:
+    name: Init
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
+
+  validate:
+    name: Validate
+    needs: init
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
+
+      - name: Terraform Validate
+        run: terraform -chdir=google-cloud validate
+
+  plan:
+    name: Plan
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      has_changes: ${{ steps.plan.outputs.has_changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set +e
+          terraform -chdir=google-cloud plan -detailed-exitcode -input=false
+          exitcode=$?
+
+          if [ $exitcode -eq 2 ]; then
+            echo "差分を検知しました。Applyを準備します。"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            exit 0
+          elif [ $exitcode -eq 0 ]; then
+            echo "差分はありません。Applyをスキップします。"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "Terraform Planでエラーが発生しました。"
+            exit 1
+          fi
+
+  apply:
+    name: Apply
+    # 条件1: mainブランチ or 手動実行
+    # 条件2: かつ、Planで差分があった場合のみ
+    if: ${{ github.ref_name == 'main' || github.event_name == 'workflow_dispatch' && needs.plan.outputs.has_changes == 'true' }}
+    needs: plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
+
+      - name: Terraform Apply
+        run: terraform -chdir=google-cloud apply -auto-approve -input=false

@@ -1,0 +1,25 @@
+name: Common Terraform Setup
+description: "Checkout, Setup Terraform, and Auth to Google Cloud"
+
+runs:
+  using: composite
+  steps:
+    - name: Cache Terraform Providers
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.terraform.d/plugin-cache
+        key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
+
+    - name: Setup Terraform
+      uses: ./.github/actions/setup-terraform
+
+    - name: Authenticate to Google Cloud
+      uses: ./.github/actions/auth-google-cloud
+
+    - name: Terraform Init
+      shell: bash
+      run: |
+        mkdir -p ${{ github.workspace }}/.terraform.d/plugin-cache
+        terraform -chdir=google-cloud init
+      env:
+        TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
