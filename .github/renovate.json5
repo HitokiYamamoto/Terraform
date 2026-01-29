@@ -38,6 +38,25 @@
       depNameTemplate: "golang/go",
       datasourceTemplate: "golang-version",
     },
+    // TFLint Version
+    {
+      customType: "regex",
+      description: "Dockerfile TFLint version",
+      fileMatch: ["(^|/)Dockerfile.*$"],
+      matchStrings: [
+        "ENV TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "terraform-linters/tflint",
+      datasourceTemplate: "github-releases",
+    },
+    {
+      customType: "regex",
+      description: "CI Workflow TFLint version",
+      fileMatch: ["(^|/)\\.github/workflows/.*\\.ya?ml$"],
+      matchStrings: [
+        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\b",
+      ],
+    },
   ],
   packageRules: [
     // Group Terraform version updates
@@ -51,6 +70,12 @@
       description: "Group Go updates in action.yml, Dockerfile, and go.mod",
       matchPackageNames: ["go", "golang"],
       groupName: "Go Ecosystem",
+    },
+    // Group TFLint updates
+    {
+      description: "Group TFLint version updates in GitHub Actions and Dockerfile",
+      matchPackageNames: ["terraform-linters/tflint", "tflint"],
+      groupName: "TFLint Version",
     },
   ],
 }
