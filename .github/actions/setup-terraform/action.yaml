@@ -1,12 +1,6 @@
 name: Setup Terraform
 description: Common setup for Terraform
 
-inputs:
-  terraform_wrapper:
-    description: "Whether to enable the Terraform wrapper script"
-    required: false
-    default: "true"
-
 runs:
   using: composite
   steps:
@@ -14,4 +8,4 @@ runs:
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.14.4
-        terraform_wrapper: ${{ inputs.terraform_wrapper }}
+        terraform_wrapper: false
