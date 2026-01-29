@@ -1,6 +1,6 @@
 FROM ubuntu:noble
 
-ENV TERRAFORM_VERSION=1.14.3
+ENV TERRAFORM_VERSION=1.14.4
 ENV TFLINT_VERSION=0.55.0
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
