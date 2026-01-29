@@ -1,40 +1,34 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: ['config:best-practices', ':disableDependencyDashboard'],
-  labels: ['renovate'],
-
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:best-practices", ":disableDependencyDashboard"],
+  labels: ["renovate"],
   customManagers: [
-    // GitHub Actions内の terraform_version: x.x.x を検出
     {
-      customType: 'regex',
-      fileMatch: [
-        '^\\.github/workflows/.*\\.ya?ml$',
-        '^\\.github/actions/.*\\.ya?ml$',
+      customType: "regex",
+      managerFilePatterns: [
+        "/^\\.github/workflows/.*\\.ya?ml$/",
+        "/^\\.github/actions/.*\\.ya?ml$/",
       ],
       matchStrings: [
-        'terraform_version:\\s*["\']?(?<currentValue>[\\d\\.]+)["\']?',
+        "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
       ],
-      depNameTemplate: 'hashicorp/terraform',
-      datasourceTemplate: 'github-releases',
+      depNameTemplate: "hashicorp/terraform",
+      datasourceTemplate: "github-releases",
     },
-    // Dockerfile内の ENV TERRAFORM_VERSION=x.x.x を検出
     {
-      customType: 'regex',
-      fileMatch: ['(^|/)Dockerfile$'], // Dockerfileという名前のファイルすべて
+      customType: "regex",
+      managerFilePatterns: ["/(^|/)Dockerfile$/"],
       matchStrings: [
-        // "ENV TERRAFORM_VERSION=1.14.3" または "ENV TERRAFORM_VERSION 1.14.3" に対応
-        'ENV TERRAFORM_VERSION[=\\s]["\']?(?<currentValue>[\\d\\.]+)["\']?',
+        "ENV TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>[\\d\\.]+)[\"']?",
       ],
-      depNameTemplate: 'hashicorp/terraform', // 名前を合わせることでグループ化される
-      datasourceTemplate: 'github-releases',
+      depNameTemplate: "hashicorp/terraform",
+      datasourceTemplate: "github-releases",
     },
   ],
-
   packageRules: [
     {
-      // .tfファイル、Actions、Dockerfileがここに集約
-      matchPackageNames: ['hashicorp/terraform', 'terraform'],
-      groupName: 'Terraform Version',
+      matchPackageNames: ["hashicorp/terraform", "terraform"],
+      groupName: "Terraform Version",
     },
   ],
 }
