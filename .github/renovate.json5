@@ -27,12 +27,32 @@
     },
     {
       customType: "regex",
-      description: "Dockerfile ENV updates",
+      description: "Dockerfile ENV: Terraform",
       fileMatch: ["(^|/)Dockerfile$"],
       matchStrings: [
-        "ENV\\s+(?<depName>[A-Z_]+)_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+        "ENV\\s+TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
-      depNameTemplate: "{{#if (eq depName 'TERRAFORM')}}hashicorp/terraform{{else if (eq depName 'TFLINT')}}terraform-linters/tflint{{else if (eq depName 'TASK')}}go-task/task{{else}}{{depName}}{{/if}}",
+      depNameTemplate: "hashicorp/terraform",
+      datasourceTemplate: "github-releases",
+    },
+    {
+      customType: "regex",
+      description: "Dockerfile ENV: TFLint",
+      fileMatch: ["(^|/)Dockerfile$"],
+      matchStrings: [
+        "ENV\\s+TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "terraform-linters/tflint",
+      datasourceTemplate: "github-releases",
+    },
+    {
+      customType: "regex",
+      description: "Dockerfile ENV: Task",
+      fileMatch: ["(^|/)Dockerfile$"],
+      matchStrings: [
+        "ENV\\s+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "go-task/task",
       datasourceTemplate: "github-releases",
     },
   ],
