@@ -8,7 +8,7 @@ inputs:
   task-version:
     description: "Task version to use"
     required: false
-    default: "3.46.4"
+    default: "3.46.4" # renovate: datasource=github-releases depName=go-task/task
   working-directory:
     description: "Directory where go.sum is located"
     required: false

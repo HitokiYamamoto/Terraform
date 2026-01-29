@@ -5,18 +5,19 @@
   customManagers: [
     {
       customType: "regex",
-      description: "Comment-based updates for YAML",
+      description: "Comment-based updates for YAML and Justfile",
       fileMatch: [
         "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
         "(^|/)action\\.ya?ml$",
+        "(^|/)justfile$",
       ],
       matchStrings: [
         "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\b",
       ],
     },
-
     {
       customType: "regex",
+      description: "Terraform version (legacy support)",
       fileMatch: ["(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$"],
       matchStrings: [
         "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
@@ -24,15 +25,14 @@
       depNameTemplate: "hashicorp/terraform",
       datasourceTemplate: "github-releases",
     },
-
     {
       customType: "regex",
+      description: "Dockerfile ENV updates",
       fileMatch: ["(^|/)Dockerfile$"],
       matchStrings: [
         "ENV\\s+(?<depName>[A-Z_]+)_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
-
-      depNameTemplate: "{{#if (eq depName 'TERRAFORM')}}hashicorp/terraform{{else if (eq depName 'TFLINT')}}terraform-linters/tflint{{else}}{{depName}}{{/if}}",
+      depNameTemplate: "{{#if (eq depName 'TERRAFORM')}}hashicorp/terraform{{else if (eq depName 'TFLINT')}}terraform-linters/tflint{{else if (eq depName 'TASK')}}go-task/task{{else}}{{depName}}{{/if}}",
       datasourceTemplate: "github-releases",
     },
   ],
@@ -48,6 +48,14 @@
     {
       matchPackagePatterns: ["tflint"],
       groupName: "TFLint Version",
+    },
+    {
+      matchPackagePatterns: ["go-task/task"],
+      groupName: "Task Version",
+    },
+    {
+      matchPackagePatterns: ["trivy"],
+      groupName: "Trivy Version",
     },
   ],
 }
