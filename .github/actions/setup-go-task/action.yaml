@@ -18,12 +18,12 @@ runs:
   using: composite
   steps:
     - name: Set up Golang
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
       with:
         go-version: ${{ inputs.go-version }}
         cache-dependency-path: ${{ inputs.working-directory }}/go.sum
 
     - name: Install Task
-      uses: go-task/setup-task@v1
+      uses: go-task/setup-task@0ab1b2a65bc55236a3bc64cde78f80e20e8885c2 # v1
       with:
         version: ${{ inputs.task-version }}

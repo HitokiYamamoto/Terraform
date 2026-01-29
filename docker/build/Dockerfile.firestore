@@ -1,4 +1,4 @@
-FROM openjdk:27-ea-slim-trixie
+FROM openjdk:27-ea-slim-trixie@sha256:e845b70a966d9f2cfd17b19ff6d07401f35266f231b8890dd36ce99726f38188
 
 RUN apt-get update && apt-get --no-install-recommends -y install \
     curl \
