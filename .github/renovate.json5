@@ -31,8 +31,7 @@
       matchStrings: [
         "ENV\\s+(?<depName>[A-Z_]+)_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
-
-      depNameTemplate: "{{#if (eq depName 'TERRAFORM')}}hashicorp/terraform{{else if (eq depName 'TFLINT')}}terraform-linters/tflint{{else}}{{depName}}{{/if}}",
+      depNameTemplate: "{{#if (eq depName 'TERRAFORM')}}hashicorp/terraform{{else if (eq depName 'TFLINT')}}terraform-linters/tflint{{else if (eq depName 'TASK')}}go-task/task{{else}}{{depName}}{{/if}}",
       datasourceTemplate: "github-releases",
     },
   ],
@@ -48,6 +47,10 @@
     {
       matchPackagePatterns: ["tflint"],
       groupName: "TFLint Version",
+    },
+    {
+      matchPackagePatterns: ["go-task/task"],
+      groupName: "Task Version",
     },
   ],
 }
