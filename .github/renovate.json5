@@ -6,10 +6,10 @@
     {
       customType: "regex",
       description: "Comment-based updates for YAML and Justfile",
-      fileMatch: [
-        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
-        "(^|/)action\\.ya?ml$",
-        "(^|/)justfile$",
+      managerFilePatterns: [
+        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
+        "/(^|/)action\\.ya?ml$/",
+        "/(^|/)justfile$/",
       ],
       matchStrings: [
         "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\b",
@@ -18,7 +18,7 @@
     {
       customType: "regex",
       description: "Terraform version (legacy support)",
-      fileMatch: ["(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$"],
+      managerFilePatterns: ["/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/"],
       matchStrings: [
         "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
       ],
@@ -28,7 +28,7 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: Terraform",
-      fileMatch: ["(^|/)Dockerfile$"],
+      managerFilePatterns: ["/(^|/)Dockerfile$/"],
       matchStrings: [
         "ENV\\s+TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
@@ -38,7 +38,7 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: TFLint",
-      fileMatch: ["(^|/)Dockerfile$"],
+      managerFilePatterns: ["/(^|/)Dockerfile$/"],
       matchStrings: [
         "ENV\\s+TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
@@ -48,7 +48,7 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: Task",
-      fileMatch: ["(^|/)Dockerfile$"],
+      managerFilePatterns: ["/(^|/)Dockerfile$/"],
       matchStrings: [
         "ENV\\s+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
@@ -58,24 +58,24 @@
   ],
   packageRules: [
     {
-      matchPackagePatterns: ["terraform"],
       groupName: "Terraform Version",
+      matchPackageNames: ["/terraform/"],
     },
     {
-      matchPackagePatterns: ["^go$", "golang"],
       groupName: "Go Ecosystem",
+      matchPackageNames: ["/^go$/", "/golang/"],
     },
     {
-      matchPackagePatterns: ["tflint"],
       groupName: "TFLint Version",
+      matchPackageNames: ["/tflint/"],
     },
     {
-      matchPackagePatterns: ["go-task/task"],
       groupName: "Task Version",
+      matchPackageNames: ["/go-task/task/"],
     },
     {
-      matchPackagePatterns: ["trivy"],
       groupName: "Trivy Version",
+      matchPackageNames: ["/trivy/"],
     },
   ],
 }
