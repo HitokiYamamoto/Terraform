@@ -39,11 +39,13 @@ trivy:
 
 # Prettier for YAML and JSON5 files
 prettier:
-    docker compose run --rm prettier --write "**/*.yaml" "**/*.json5"
+    docker compose run --rm node \
+        npx prettier@3.8.0 --write "**/*.yaml" "**/*.json5"
 
 # Lint check for YAML files
 yamllint:
-    docker compose run --rm yamllint .
+    docker compose run --rm python \
+        uv tool run yamllint@1.35.1 .
 
 # Golangのタスク実行(default: task list)
 task +args="":

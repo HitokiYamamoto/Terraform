@@ -16,21 +16,29 @@ services:
         target: /home/terraform/.config/gcloud
     working_dir: /home/terraform/workspace
 
-  prettier:
-    image: tmknom/prettier@sha256:31684fd957f78ddebd0fc003f2790da08bd7a41cfe1146912da43a114fbeebf9
+  node:
+    build:
+      context: ./docker/build
+      dockerfile: Dockerfile.node
+    env_file:
+      - .env
     volumes:
       - type: bind
         source: .
-        target: /workspace
-    working_dir: /workspace
+        target: /home/node/workspace
+    working_dir: /home/node/workspace
 
-  yamllint:
-    image: cytopia/yamllint@sha256:3e9eb827ab2b12a5ea5f49d4257bb3aca94bba9f1ba427c8bc7f2456385a5204
+  python:
+    build:
+      context: ./docker/build
+      dockerfile: Dockerfile.python
+    env_file:
+      - .env
     volumes:
       - type: bind
         source: .
-        target: /workspace
-    working_dir: /workspace
+        target: /home/python/workspace
+    working_dir: /home/python/workspace
 
   golang:
     build:
