@@ -81,6 +81,10 @@
       matchPackageNames: ["/trivy/"],
     },
     {
+      groupName: "uv Version",
+      matchPackageNames: ["/ghcr.io/astral-sh/uv/", "/astral-sh/uv/"],
+    },
+    {
       matchUpdateTypes: ["major", "minor", "patch"],
       prTitle: "update {{depName}} to {{newVersion}}",
     },
