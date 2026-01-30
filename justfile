@@ -78,6 +78,8 @@ budget-publish-test:
             "currencyCode": "JPY", \
         }'
 
+[private]
+RENOVATE_VERSION := "42.94.6"  # renovate: datasource=docker depName=renovate/renovate
 # Renovateのチェック
 renovate-check:
     @docker run --rm -it \
@@ -87,7 +89,7 @@ renovate-check:
         --env RENOVATE_BASE_BRANCHES=`git branch --show-current` \
         --env LOG_FORMAT=json \
         --mount type=bind,source="$(pwd)/.github/renovate.json5",target=/target/.github/renovate.json5 \
-        renovate/renovate:42.94.6 \
+        renovate/renovate:{{ RENOVATE_VERSION  }} \
         --dry-run=full \
         "HitokiYamamoto/Terraform" > .vscode/renovate.log 2>&1
 
