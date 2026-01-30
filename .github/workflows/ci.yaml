@@ -29,7 +29,7 @@ jobs:
     name: Prettier Check
     runs-on: ubuntu-latest
     env:
-      PRETTIER_VERSION: 3.8.0 # renovate: datasource=npm depName=prettier
+      PRETTIER_VERSION: 3.8.1 # renovate: datasource=npm depName=prettier
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
