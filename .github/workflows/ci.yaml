@@ -10,6 +10,8 @@ jobs:
   yamllint:
     name: Yaml Check
     runs-on: ubuntu-latest
+    env:
+      YAMLLINT_VERSION: 1.35.1 # renovate: datasource=github-releases depName=adrienverge/yamllint
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -21,7 +23,7 @@ jobs:
           version: "0.9.28"
 
       - name: Run yamllint
-        run: uv tool run yamllint@1.35.1 .
+        run: uv tool run yamllint@${{ env.YAMLLINT_VERSION }} .
 
   prettier:
     name: Prettier Check
