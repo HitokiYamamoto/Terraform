@@ -87,7 +87,7 @@ jobs:
           format: table
           exit-code: "1"
           severity: CRITICAL,HIGH,MEDIUM,LOW
-          scanners: config,secret,vuln
+          scanners: misconfig,secret,vuln
           trivyignores: .trivyignore
 
   terraform:
