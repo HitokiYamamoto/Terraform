@@ -1,7 +1,16 @@
+# (LOW): Add HEALTHCHECK instruction in your Dockerfile
 # HEALTHCHECK不要: このDockerイメージはTerraform/TFLintを実行するためのCLIツールコンテナであり、
 # 常時稼働するサービスではないため、ヘルスチェックは必要ない
 AVD-DS-0026
+DS-0026
 
+# (LOW): Storage bucket encryption does not use a customer-managed key.
 # 「暗号化キーを自分で管理していない（Google任せにしている）」という指摘
 # お金がかかる上に、個人開発にはオーバースペックなので除外
 AVD-GCP-0066
+GCP-0066
+
+# (MEDIUM): Storage bucket logging is not configured with a target log bucket.
+# ログ保存用のバケットを別途用意していない、という指摘
+# Cloud Logging側で監査ログを取る予定なので除外
+GCP-0077
