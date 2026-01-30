@@ -1,7 +1,10 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
   extends: ["config:best-practices", ":disableDependencyDashboard"],
+
   labels: ["renovate"],
+
   customManagers: [
     {
       customType: "regex",
@@ -12,29 +15,27 @@
         "/(^|/)justfile$/",
       ],
       matchStrings: [
-        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=(?<datasource>.*?)\\s+depName=(?<depName>.*?)\\b",
+        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?\\s+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
       ],
+      depNameTemplate: "{{ depName }}",
+      datasourceTemplate: "{{ datasource }}",
     },
+
     {
       customType: "regex",
-      description: "Terraform version (legacy support)",
-      managerFilePatterns: ["/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/"],
+      description: "Terraform version in GitHub Actions YAML and Dockerfile",
+      managerFilePatterns: [
+        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
+        "/(^|/)Dockerfile$/",
+      ],
       matchStrings: [
         "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
-      ],
-      depNameTemplate: "hashicorp/terraform",
-      datasourceTemplate: "github-releases",
-    },
-    {
-      customType: "regex",
-      description: "Dockerfile ENV: Terraform",
-      managerFilePatterns: ["/(^|/)Dockerfile$/"],
-      matchStrings: [
         "ENV\\s+TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "hashicorp/terraform",
       datasourceTemplate: "github-releases",
     },
+
     {
       customType: "regex",
       description: "Dockerfile ENV: TFLint",
@@ -45,6 +46,7 @@
       depNameTemplate: "terraform-linters/tflint",
       datasourceTemplate: "github-releases",
     },
+
     {
       customType: "regex",
       description: "Dockerfile ENV: Task",
@@ -56,6 +58,7 @@
       datasourceTemplate: "github-releases",
     },
   ],
+
   packageRules: [
     {
       groupName: "Terraform Version",
