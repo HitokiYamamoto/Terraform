@@ -84,6 +84,7 @@ renovate-check:
         --env RENOVATE_TOKEN=${GITHUB_TOKEN} \
         --env LOG_LEVEL=debug \
         --env RENOVATE_CONFIG_FILE="/target/.github/renovate.json5" \
+        --env RENOVATE_BASE_BRANCHES=`git branch --show-current` \
         --env LOG_FORMAT=json \
         --mount type=bind,source="$(pwd)/.github/renovate.json5",target=/target/.github/renovate.json5 \
         renovate/renovate:42.94.6 \
