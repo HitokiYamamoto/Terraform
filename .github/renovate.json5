@@ -50,7 +50,7 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: Task",
-      managerFilePatterns: ["/(^|/)Dockerfile$/"],
+      managerFilePatterns: ["/(^|/)Dockerfile.golang$/"],
       matchStrings: [
         "ENV\\s+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
