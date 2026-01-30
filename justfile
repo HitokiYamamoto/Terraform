@@ -82,7 +82,7 @@ renovate-check:
         --dry-run=full \
         "HitokiYamamoto/Terraform" > .vscode/renovate.log 2>&1
 
-    @cat .vscode/renovate.json.log | jq -r ' \
+    @cat .vscode/renovate.log | jq -r ' \
     select(.branchesInformation) \
     | .branchesInformation[] \
     | .branchName as $branch \
