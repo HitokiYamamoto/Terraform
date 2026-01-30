@@ -79,6 +79,8 @@
     {
       groupName: "Trivy Version",
       matchPackageNames: ["/trivy/"],
+      matchDatasources: ["docker"],
+      pinDigests: true,
     },
     {
       groupName: "uv Version",
@@ -91,6 +93,12 @@
     {
       groupName: "Prettier Version",
       matchPackageNames: ["/prettier/"],
+    },
+    {
+      groupName: "Renovate Docker Digest",
+      matchDatasources: ["docker"],
+      matchDepNames: ["renovate/renovate"],
+      pinDigests: true,
     },
     {
       matchUpdateTypes: ["major", "minor", "patch"],
