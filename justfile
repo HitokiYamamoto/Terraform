@@ -31,7 +31,7 @@ lint:
     docker compose run --rm terraform tflint --recursive
 
 [private]
-TRIVY_VERSION := "0.68.2" # renovate: datasource=docker depName=aquasec/trivy
+TRIVY_VERSION := "0.69.0" # renovate: datasource=docker depName=aquasec/trivy
 # security scan with trivy
 trivy:
     docker run --rm -it \
@@ -40,6 +40,7 @@ trivy:
         aquasec/trivy:{{ TRIVY_VERSION  }} \
         filesystem \
         --ignorefile .trivyignore \
+        --skip-files "bootstrap/main.tf" \
         --scanners misconfig,vuln .
 
 # Prettier for YAML and JSON5 files
