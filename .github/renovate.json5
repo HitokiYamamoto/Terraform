@@ -89,6 +89,10 @@
       matchPackageNames: ["/yamllint/"],
     },
     {
+      groupName: "Prettier Version",
+      matchPackageNames: ["/prettier/"],
+    },
+    {
       matchUpdateTypes: ["major", "minor", "patch"],
       prTitle: "update {{depName}} to {{newVersion}}",
     },

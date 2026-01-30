@@ -28,6 +28,8 @@ jobs:
   prettier:
     name: Prettier Check
     runs-on: ubuntu-latest
+    env:
+      PRETTIER_VERSION: 3.8.0 # renovate: datasource=npm depName=prettier
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -38,7 +40,7 @@ jobs:
           node-version: 24
 
       - name: Run Prettier
-        run: npx prettier@3.8.0 --check .
+        run: npx prettier@${{ env.PRETTIER_VERSION }} --check .
 
   format-check:
     name: Terraform Format Check
