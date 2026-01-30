@@ -31,7 +31,7 @@ lint:
     docker compose run --rm terraform tflint --recursive
 
 [private]
-TRIVY_VERSION := "0.68.2" # renovate: datasource=docker depName=aquasec/trivy
+TRIVY_VERSION := "0.69.0" # renovate: datasource=docker depName=aquasec/trivy
 # security scan with trivy
 trivy:
     docker run --rm -it \
