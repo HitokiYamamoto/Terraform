@@ -72,11 +72,21 @@ budget-publish-test:
 
 # Renovateのチェック
 renovate-check:
-    docker run --rm -it \
+    @docker run --rm -it \
         --env RENOVATE_TOKEN=${GITHUB_TOKEN} \
         --env LOG_LEVEL=debug \
         --env RENOVATE_CONFIG_FILE="/target/.github/renovate.json5" \
+        --env LOG_FORMAT=json \
         --mount type=bind,source="$(pwd)/.github/renovate.json5",target=/target/.github/renovate.json5 \
         renovate/renovate:42.94.6 \
         --dry-run=full \
         "HitokiYamamoto/Terraform" > .vscode/renovate.log 2>&1
+
+    @cat .vscode/renovate.json.log | jq -r ' \
+    select(.branchesInformation) \
+    | .branchesInformation[] \
+    | .branchName as $branch \
+    | .result as $result \
+    | .upgrades[] \
+    | [$branch, $result, .depName, .packageFile] \
+    | @tsv' | column -t -s $'\t'
