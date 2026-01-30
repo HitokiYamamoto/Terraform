@@ -79,7 +79,7 @@ budget-publish-test:
         }'
 
 [private]
-RENOVATE_VERSION := "42.94.6"  # renovate: datasource=docker depName=renovate/renovate
+RENOVATE_VERSION := "42.95.1"  # renovate: datasource=docker depName=renovate/renovate
 # Renovateのチェック
 renovate-check:
     @docker run --rm -it \
