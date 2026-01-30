@@ -43,10 +43,12 @@ trivy:
         --skip-files "bootstrap/main.tf" \
         --scanners misconfig,vuln .
 
+[private]
+PRETTIER_VERSION := "3.8.0" # renovate: datasource=npm depName=prettier
 # Prettier for YAML and JSON5 files
 prettier:
     docker compose run --rm node \
-        npx prettier@3.8.0 --write "**/*.yaml" "**/*.json5"
+        npx prettier@{{ PRETTIER_VERSION }} --write "**/*.yaml" "**/*.json5"
 
 [private]
 YAMLLINT_VERSION := "1.35.1" # renovate: datasource=github-releases depName=adrienverge/yamllint
