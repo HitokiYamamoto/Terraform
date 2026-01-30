@@ -1,7 +1,7 @@
 FROM ubuntu:noble@sha256:cd1dba651b3080c3686ecf4e3c4220f026b521fb76978881737d24f200828b2b
 
 ENV TERRAFORM_VERSION=1.14.4
-ENV TFLINT_VERSION=0.55.0
+ENV TFLINT_VERSION=0.60.0
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     curl \
