@@ -89,6 +89,7 @@ jobs:
           severity: CRITICAL,HIGH,MEDIUM,LOW
           scanners: misconfig,secret,vuln
           trivyignores: .trivyignore
+          skip-files: "bootstrap/main.tf" # GCP-0078が誤検知するためスキップ
 
   terraform:
     permissions:

@@ -40,6 +40,7 @@ trivy:
         aquasec/trivy:{{ TRIVY_VERSION  }} \
         filesystem \
         --ignorefile .trivyignore \
+        --skip-files "bootstrap/main.tf" \
         --scanners misconfig,vuln .
 
 # Prettier for YAML and JSON5 files
