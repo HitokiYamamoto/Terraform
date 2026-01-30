@@ -48,10 +48,12 @@ prettier:
     docker compose run --rm node \
         npx prettier@3.8.0 --write "**/*.yaml" "**/*.json5"
 
+[private]
+YAMLLINT_VERSION := "1.35.1" # renovate: datasource=github-releases depName=adrienverge/yamllint
 # Lint check for YAML files
 yamllint:
     docker compose run --rm python \
-        uv tool run yamllint@1.35.1 .
+        uv tool run yamllint@{{ YAMLLINT_VERSION  }} .
 
 # Golangのタスク実行(default: task list)
 task +args="":

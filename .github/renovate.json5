@@ -85,6 +85,10 @@
       matchPackageNames: ["/ghcr.io/astral-sh/uv/", "/astral-sh/uv/"],
     },
     {
+      groupName: "YamlLint Version",
+      matchPackageNames: ["/yamllint/"],
+    },
+    {
       matchUpdateTypes: ["major", "minor", "patch"],
       prTitle: "update {{depName}} to {{newVersion}}",
     },
