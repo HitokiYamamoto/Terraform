@@ -31,7 +31,7 @@ lint:
     docker compose run --rm terraform tflint --recursive
 
 [private]
-TRIVY_VERSION := "0.69.0"
+TRIVY_VERSION := "0.69.0@sha256:33f816d414b9d582d25bb737ffa4a632ae34e222f7ec1b50252cef0ce2266006"
 # security scan with trivy
 trivy:
     docker run --rm -it \
