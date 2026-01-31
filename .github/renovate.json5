@@ -7,12 +7,12 @@
       customType: "regex",
       description: "Comment-based updates for YAML and Justfile",
       managerFilePatterns: [
-        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
-        "/(^|/)action\\.ya?ml$/",
-        "/(^|/)justfile$/",
+        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
+        "(^|/)action\\.ya?ml$",
+        "(^|/)justfile$",
       ],
       matchStrings: [
-        "[:=]\\s*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?\\s*#\\s*renovate:\\s*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?\\s+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
+        "[:=][ \\t]*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?[ \\t]*#[ \\t]*renovate:[ \\t]*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?[ \\t]+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
       ],
       depNameTemplate: "{{ depName }}",
       datasourceTemplate: "{{ datasource }}",
@@ -22,12 +22,12 @@
       customType: "regex",
       description: "Terraform version in GitHub Actions YAML and Dockerfile",
       managerFilePatterns: [
-        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
-        "/(^|/)Dockerfile$/",
+        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
+        "(^|/)Dockerfile$",
       ],
       matchStrings: [
-        "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
-        "ENV\\s+TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+        "terraform_version:[ \\t]*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
+        "ENV[ \\t]+TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "hashicorp/terraform",
       datasourceTemplate: "github-releases",
@@ -35,9 +35,9 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: TFLint",
-      managerFilePatterns: ["/(^|/)Dockerfile$/"],
+      managerFilePatterns: ["(^|/)Dockerfile$"],
       matchStrings: [
-        "ENV\\s+TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+        "ENV[ \\t]+TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "terraform-linters/tflint",
       datasourceTemplate: "github-releases",
@@ -45,9 +45,9 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: Task",
-      managerFilePatterns: ["/(^|/)Dockerfile\\.golang$/"],
+      managerFilePatterns: ["(^|/)Dockerfile\\.golang$"],
       matchStrings: [
-        "ENV\\s+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+        "ENV[ \\t]+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "go-task/task",
       datasourceTemplate: "github-releases",
