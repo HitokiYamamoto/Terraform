@@ -23,20 +23,6 @@ module "kubernetes" {
   archived               = false
 }
 
-# このリポジトリ自体のモジュール呼び出し
-module "github_management" {
-  source                 = "./modules/repository"
-  repository_name        = "GitHub-Management"
-  description            = "GitHubリポジトリ設定管理用リポジトリ"
-  visibility             = "private"
-  has_issues             = false
-  has_wiki               = false
-  auto_init              = true
-  topics                 = ["github", "terraform"]
-  delete_branch_on_merge = true
-  archived               = false
-}
-
 module "github_copilot" {
   source                 = "./modules/repository"
   repository_name        = "Github-Copilot"
