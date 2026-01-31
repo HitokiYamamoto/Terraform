@@ -3,6 +3,9 @@ name: Terraform
 on:
   push:
     branches:
+      - "main"
+  pull_request:
+    branches:
       - "**"
   workflow_dispatch:
 
@@ -101,6 +104,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
+      issues: write
     needs:
       - yamllint
       - prettier
