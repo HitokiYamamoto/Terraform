@@ -1,18 +1,15 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-
   extends: ["config:best-practices", ":disableDependencyDashboard"],
-
   labels: ["renovate"],
-
   customManagers: [
     {
       customType: "regex",
       description: "Comment-based updates for YAML and Justfile",
-      fileMatch: [
-        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
-        "(^|/)action\\.ya?ml$",
-        "(^|/)justfile$",
+      managerFilePatterns: [
+        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
+        "/(^|/)action\\.ya?ml$/",
+        "/(^|/)justfile$/",
       ],
       matchStrings: [
         "[:=]\\s*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?\\s*#\\s*renovate:\\s*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?\\s+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
@@ -21,13 +18,12 @@
       datasourceTemplate: "{{ datasource }}",
       autoReplaceStringTemplate: "{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}",
     },
-
     {
       customType: "regex",
       description: "Terraform version in GitHub Actions YAML and Dockerfile",
-      fileMatch: [
-        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
-        "(^|/)Dockerfile$",
+      managerFilePatterns: [
+        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
+        "/(^|/)Dockerfile$/",
       ],
       matchStrings: [
         "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
@@ -36,22 +32,20 @@
       depNameTemplate: "hashicorp/terraform",
       datasourceTemplate: "github-releases",
     },
-
     {
       customType: "regex",
       description: "Dockerfile ENV: TFLint",
-      fileMatch: ["(^|/)Dockerfile$"],
+      managerFilePatterns: ["/(^|/)Dockerfile$/"],
       matchStrings: [
         "ENV\\s+TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "terraform-linters/tflint",
       datasourceTemplate: "github-releases",
     },
-
     {
       customType: "regex",
       description: "Dockerfile ENV: Task",
-      fileMatch: ["(^|/)Dockerfile\\.golang$"],
+      managerFilePatterns: ["/(^|/)Dockerfile\\.golang$/"],
       matchStrings: [
         "ENV\\s+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
