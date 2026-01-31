@@ -82,8 +82,16 @@ budget-publish-test:
 
 [private]
 RENOVATE_VERSION := "42.94.6"  # renovate: datasource=docker depName=renovate/renovate
-# Renovateのチェック
-renovate-check:
+# Renovateの設定ファイル検証
+renovate-validate:
+    @docker run --rm -it \
+        --mount type=bind,source="$(pwd)/.github/renovate.json5",target=/target/renovate.json5 \
+        --workdir /target \
+        renovate/renovate:{{ RENOVATE_VERSION  }} \
+        renovate-config-validator
+
+# Renovateのデバッグ実行
+renovate-debug:
     @docker run --rm -it \
         --env RENOVATE_TOKEN=${GITHUB_TOKEN} \
         --env LOG_LEVEL=debug \
