@@ -46,12 +46,16 @@ jobs:
         run: terraform -chdir=google-cloud validate
 
   plan:
+    # 条件: プルリクエスト or mainブランチへのpush
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_name == 'main') }}
     name: Plan
     needs: validate
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
+      issues: write
     outputs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
@@ -61,12 +65,33 @@ jobs:
       - name: Common Setup
         uses: ./.github/actions/common-setup
 
+      - name: setup tfcmt
+        env:
+          TFCMT_VERSION: v3.4.1
+        run: |
+          wget "https://github.com/suzuki-shunsuke/tfcmt/releases/download/${TFCMT_VERSION}/tfcmt_linux_amd64.tar.gz" -O /tmp/tfcmt.tar.gz
+          tar xzf /tmp/tfcmt.tar.gz -C /tmp
+          mv /tmp/tfcmt /usr/local/bin
+          tfcmt --version
+
       - name: Terraform Plan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: plan
         run: |
           set +e
-          terraform -chdir=google-cloud plan -detailed-exitcode -input=false
-          exitcode=$?
+          TF_CMD="terraform -chdir=google-cloud plan -detailed-exitcode -input=false"
+
+          # PRの時だけ tfcmt でラップして実行
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "Running with tfcmt..."
+            tfcmt plan -patch -- $TF_CMD
+            exitcode=$?
+          else
+            echo "Running standard terraform plan..."
+            $TF_CMD
+            exitcode=$?
+          fi
 
           if [ $exitcode -eq 2 ]; then
             echo "差分を検知しました。Applyを準備します。"
