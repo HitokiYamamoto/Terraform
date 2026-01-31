@@ -10,9 +10,9 @@ gcloud-login:
         bash ./scripts/gcloud-auth.sh
 
 # terraform commands
-terraform +args:
+terraform-bootstrap +args:
     docker compose run --rm terraform \
-        terraform -chdir=bootstrap {{ args }}
+        terraform -chdir=google-cloud/bootstrap {{ args }}
 
 # terraform commands with service account impersonation
 terraform-impersonate service_account +args:
@@ -40,7 +40,7 @@ trivy:
         aquasec/trivy:{{ TRIVY_VERSION  }} \
         filesystem \
         --ignorefile .trivyignore \
-        --skip-files "bootstrap/main.tf" \
+        --skip-files "google-cloud/bootstrap/main.tf" \
         --scanners misconfig,vuln .
 
 [private]
