@@ -103,6 +103,7 @@
       matchDatasources: ["docker"],
       matchDepNames: ["renovate/renovate"],
       pinDigests: true,
+      separateMajorMinor: false,
     },
     {
       matchUpdateTypes: ["major", "minor", "patch"],
