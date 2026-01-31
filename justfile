@@ -104,8 +104,9 @@ renovate-debug:
         --dry-run=full \
         "HitokiYamamoto/Terraform" > .vscode/renovate.log 2>&1
 
-    @cat .vscode/renovate.log | jq -r ' \
-    select(.branchesInformation) \
+    @cat .vscode/renovate.log | jq -r -R ' \
+    fromjson? \
+    | select(.branchesInformation) \
     | .branchesInformation[] \
     | .branchName as $branch \
     | .result as $result \
