@@ -81,7 +81,7 @@ budget-publish-test:
         }'
 
 [private]
-RENOVATE_VERSION := "42.94.6"
+RENOVATE_VERSION := "43.0.6@sha256:7060157229f98564dedcf52046e28f241ff26d521105cc87594c6e3da210b80c"
 # Renovateの設定ファイル検証
 renovate-validate:
     @docker run --rm -it \
