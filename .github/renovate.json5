@@ -9,13 +9,13 @@
     {
       customType: "regex",
       description: "Comment-based updates for YAML and Justfile",
-      managerFilePatterns: [
-        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
-        "/(^|/)action\\.ya?ml$/",
-        "/(^|/)justfile$/",
+      fileMatch: [
+        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
+        "(^|/)action\\.ya?ml$",
+        "(^|/)justfile$",
       ],
       matchStrings: [
-        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+(?:@sha256:[a-f0-9]+)?)[\"']?\\s*#\\s*renovate:\\s*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?\\s+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
+        "[:=]\\s*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?\\s*#\\s*renovate:\\s*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?\\s+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
       ],
       depNameTemplate: "{{ depName }}",
       datasourceTemplate: "{{ datasource }}",
@@ -25,9 +25,9 @@
     {
       customType: "regex",
       description: "Terraform version in GitHub Actions YAML and Dockerfile",
-      managerFilePatterns: [
-        "/(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$/",
-        "/(^|/)Dockerfile$/",
+      fileMatch: [
+        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
+        "(^|/)Dockerfile$",
       ],
       matchStrings: [
         "terraform_version:\\s*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
@@ -40,7 +40,7 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: TFLint",
-      managerFilePatterns: ["/(^|/)Dockerfile$/"],
+      fileMatch: ["(^|/)Dockerfile$"],
       matchStrings: [
         "ENV\\s+TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
@@ -51,7 +51,7 @@
     {
       customType: "regex",
       description: "Dockerfile ENV: Task",
-      managerFilePatterns: ["/(^|/)Dockerfile.golang$/"],
+      fileMatch: ["(^|/)Dockerfile\\.golang$"],
       matchStrings: [
         "ENV\\s+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
@@ -59,7 +59,6 @@
       datasourceTemplate: "github-releases",
     },
   ],
-
   packageRules: [
     {
       groupName: "Terraform Version",
@@ -107,7 +106,9 @@
     },
     {
       matchUpdateTypes: ["major", "minor", "patch"],
-      prTitle: "update {{depName}} to {{newVersion}}",
+      commitMessageAction: "update",
+      commitMessageTopic: "{{depName}}",
+      commitMessageExtra: "to {{newVersion}}",
     },
   ],
 }
