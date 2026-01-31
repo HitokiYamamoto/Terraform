@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/google"
       version = "7.17.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
   }
 
   backend "gcs" {
@@ -19,4 +23,8 @@ provider "google" {
   default_labels = {
     "env" = "development"
   }
+}
+
+provider "github" {
+  owner = "HitokiYamamoto"
 }
