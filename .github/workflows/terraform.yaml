@@ -76,7 +76,7 @@ jobs:
 
       - name: Terraform Plan
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         id: plan
         run: |
           set +e
@@ -124,4 +124,6 @@ jobs:
         uses: ./.github/actions/common-setup
 
       - name: Terraform Apply
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: terraform -chdir=google-cloud apply -auto-approve -input=false

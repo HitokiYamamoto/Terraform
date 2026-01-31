@@ -14,3 +14,8 @@ GCP-0066
 # ログ保存用のバケットを別途用意していない、という指摘
 # Cloud Logging側で監査ログを取る予定なので除外
 GCP-0077
+
+# Organization Profile用のリポジトリは意図的にpublicにする必要があるため除外
+# GitHubのOrganization ProfileはREADMEを表示するためにpublicである必要がある
+# あと、普通にPublicリポジトリにしたいこともある
+GIT-0001

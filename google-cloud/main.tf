@@ -4,3 +4,7 @@ module "budget_alert" {
   project_number     = var.project_number
   billing_account_id = var.billing_account_id
 }
+
+module "github_repository" {
+  source = "./github"
+}
