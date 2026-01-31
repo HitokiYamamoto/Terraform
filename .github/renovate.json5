@@ -15,7 +15,7 @@
         "/(^|/)justfile$/",
       ],
       matchStrings: [
-        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?\\s*#\\s*renovate:\\s*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?\\s+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
+        "[:=]\\s*[\"']?(?<currentValue>v?[\\d\\.]+(?:@sha256:[a-f0-9]+)?)[\"']?\\s*#\\s*renovate:\\s*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?\\s+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
       ],
       depNameTemplate: "{{ depName }}",
       datasourceTemplate: "{{ datasource }}",
@@ -78,6 +78,9 @@
     },
     {
       groupName: "Trivy Version",
+      matchPackageNames: ["/trivy/"],
+    },
+    {
       matchPackageNames: ["/trivy/"],
       matchDatasources: ["docker"],
       pinDigests: true,
