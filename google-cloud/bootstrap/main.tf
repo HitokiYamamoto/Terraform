@@ -7,13 +7,13 @@
 */
 
 module "default_service_account" {
-  source       = "../google-cloud/modules/service_account"
+  source       = "../modules/service_account"
   account_id   = "default-terraform-sa"
   display_name = "Terraform実行用のサービスアカウント"
 }
 
 module "backend_bucket" {
-  source      = "../google-cloud/modules/cloud_storage"
+  source      = "../modules/cloud_storage"
   bucket_name = "terraform-backend-bucket"
 }
 
@@ -27,7 +27,7 @@ resource "google_storage_bucket_iam_binding" "admin" {
 }
 
 module "github_oidc" {
-  source         = "../google-cloud/modules/github_oidc"
+  source         = "../modules/github_oidc"
   project_id     = var.project_id
   github_org_id  = var.github_org_id
   github_repo_id = var.github_repo_id
