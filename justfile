@@ -51,7 +51,7 @@ prettier:
         npx prettier@{{ PRETTIER_VERSION }} --write "**/*.yaml" "**/*.json5"
 
 [private]
-YAMLLINT_VERSION := "1.35.1"
+YAMLLINT_VERSION := "v1.38.0"
 # Lint check for YAML files
 yamllint:
     docker compose run --rm python \
