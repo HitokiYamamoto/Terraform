@@ -76,13 +76,16 @@
     {
       customType: "regex",
       description: "Trivy version in GitHub Actions",
-      managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
-      matchStrings: [
-        "TRIVY_VERSION:[ \\t]*[\"'](?<currentValue>[^\"'@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?[\"']",
+      managerFilePatterns: [
+        "/^\\.github\\/(workflows|actions)\\/.*\\.ya?ml$/",
+        "/^action\\.ya?ml$/",
       ],
-      depNameTemplate: "aquasec/trivy",
-      datasourceTemplate: "docker",
-      autoReplaceStringTemplate: 'TRIVY_VERSION: "{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}"',
+      matchStrings: [
+        "TRIVY_VERSION:[ \\t]*[\"']?(?<currentValue>v[^\"'\\s]+)[\"']?",
+      ],
+      depNameTemplate: "aquasecurity/trivy",
+      datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: "TRIVY_VERSION: {{newValue}}",
     },
     // ==========================================
     // Yamllint (Justfile / GitHub Actions)
@@ -103,7 +106,7 @@
       description: "Yamllint version in GitHub Actions",
       managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
       matchStrings: [
-        "YAMLLINT_VERSION:[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"']",
+        "YAMLLINT_VERSION:[ \\t]*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?",
       ],
       depNameTemplate: "adrienverge/yamllint",
       datasourceTemplate: "github-releases",
@@ -128,7 +131,7 @@
       description: "Prettier version in GitHub Actions",
       managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
       matchStrings: [
-        "PRETTIER_VERSION:[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"']",
+        "PRETTIER_VERSION:[ \\t]*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?",
       ],
       depNameTemplate: "prettier",
       datasourceTemplate: "npm",
