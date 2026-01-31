@@ -19,6 +19,7 @@
       ],
       depNameTemplate: "{{ depName }}",
       datasourceTemplate: "{{ datasource }}",
+      autoReplaceStringTemplate: "{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}",
     },
 
     {
