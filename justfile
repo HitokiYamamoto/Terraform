@@ -100,6 +100,7 @@ renovate-debug:
         --env LOG_FORMAT=json \
         --mount type=bind,source="$(pwd)/.github/renovate.json5",target=/target/.github/renovate.json5 \
         renovate/renovate:{{ RENOVATE_VERSION  }} \
+        --require-config=ignored \
         --dry-run=full \
         "HitokiYamamoto/Terraform" > .vscode/renovate.log 2>&1
 
