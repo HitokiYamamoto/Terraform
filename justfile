@@ -44,14 +44,14 @@ trivy:
         --scanners misconfig,vuln .
 
 [private]
-PRETTIER_VERSION := "3.8.1" # renovate: datasource=npm depName=prettier
+PRETTIER_VERSION := "3.8.1"
 # Prettier for YAML and JSON5 files
 prettier:
     docker compose run --rm node \
         npx prettier@{{ PRETTIER_VERSION }} --write "**/*.yaml" "**/*.json5"
 
 [private]
-YAMLLINT_VERSION := "1.35.1" # renovate: datasource=github-releases depName=adrienverge/yamllint
+YAMLLINT_VERSION := "1.35.1"
 # Lint check for YAML files
 yamllint:
     docker compose run --rm python \

@@ -11,7 +11,7 @@ jobs:
     name: Yaml Check
     runs-on: ubuntu-latest
     env:
-      YAMLLINT_VERSION: 1.35.1 # renovate: datasource=github-releases depName=adrienverge/yamllint
+      YAMLLINT_VERSION: 1.35.1
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -29,7 +29,7 @@ jobs:
     name: Prettier Check
     runs-on: ubuntu-latest
     env:
-      PRETTIER_VERSION: 3.8.1 # renovate: datasource=npm depName=prettier
+      PRETTIER_VERSION: 3.8.1
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -68,7 +68,7 @@ jobs:
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@4cb9feea73331a35b422df102992a03a44a3bb33 # v6
         with:
-          tflint_version: v0.60.0 # renovate: datasource=github-releases depName=terraform-linters/tflint
+          tflint_version: v0.60.0
 
       - name: Run tflint
         run: |
@@ -78,6 +78,8 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    env:
+      TRIVY_VERSION: v0.69.0
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -85,7 +87,7 @@ jobs:
       - name: Setup Trivy
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
-          version: v0.69.0 # renovate: datasource=github-releases depName=aquasecurity/trivy
+          version: ${{ env.TRIVY_VERSION }}
           scan-type: fs
           scan-ref: "."
           format: table

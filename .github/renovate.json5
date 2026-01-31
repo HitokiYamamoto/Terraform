@@ -3,60 +3,195 @@
   extends: ["config:best-practices", ":disableDependencyDashboard"],
   labels: ["renovate"],
   customManagers: [
+    // ==========================================
+    // Terraform (GitHub Actions / Dockerfile)
+    // ==========================================
     {
       customType: "regex",
-      description: "Comment-based updates for YAML and Justfile",
+      description: "Terraform version in GitHub Actions",
       managerFilePatterns: [
-        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
-        "(^|/)action\\.ya?ml$",
-        "(^|/)justfile$",
-      ],
-      matchStrings: [
-        "[:=][ \\t]*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?[ \\t]*#[ \\t]*renovate:[ \\t]*datasource=[\"']?(?<datasource>[^\\s\"']+)[\"']?[ \\t]+depName=[\"']?(?<depName>[^\\s\"']+)[\"']?",
-      ],
-      depNameTemplate: "{{ depName }}",
-      datasourceTemplate: "{{ datasource }}",
-      autoReplaceStringTemplate: "{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}",
-    },
-    {
-      customType: "regex",
-      description: "Terraform version in GitHub Actions YAML and Dockerfile",
-      managerFilePatterns: [
-        "(^|/)\\.github/(workflows|actions)/.*\\.ya?ml$",
-        "(^|/)Dockerfile$",
+        "/^\\.github\\/(workflows|actions)\\/.*\\.ya?ml$/",
+        "/^action\\.ya?ml$/",
       ],
       matchStrings: [
         "terraform_version:[ \\t]*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "hashicorp/terraform",
+      datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: "terraform_version: {{newValue}}",
+    },
+    {
+      customType: "regex",
+      description: "Terraform version in Dockerfile",
+      managerFilePatterns: ["/^Dockerfile$/", "/^Dockerfile\\..*$/"],
+      matchStrings: [
         "ENV[ \\t]+TERRAFORM_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "hashicorp/terraform",
       datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: "ENV TERRAFORM_VERSION {{newValue}}",
+    },
+    // ==========================================
+    // TFLint (GitHub Actions / Dockerfile)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "TFLint version in GitHub Actions",
+      managerFilePatterns: [
+        "/^\\.github\\/(workflows|actions)\\/.*\\.ya?ml$/",
+        "/^action\\.ya?ml$/",
+      ],
+      matchStrings: [
+        "tflint_version:[ \\t]*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "terraform-linters/tflint",
+      datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: "tflint_version: {{newValue}}",
     },
     {
       customType: "regex",
-      description: "Dockerfile ENV: TFLint",
-      managerFilePatterns: ["(^|/)Dockerfile$"],
+      description: "TFLint version in Dockerfile",
+      managerFilePatterns: ["/^Dockerfile$/", "/^Dockerfile\\..*$/"],
       matchStrings: [
         "ENV[ \\t]+TFLINT_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "terraform-linters/tflint",
       datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: "ENV TFLINT_VERSION {{newValue}}",
+    },
+    // ==========================================
+    // Trivy (Justfile / GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Trivy version in Justfile",
+      managerFilePatterns: ["/^justfile$/"],
+      matchStrings: [
+        "TRIVY_VERSION[ \\t]*:=[ \\t]*[\"'](?<currentValue>[^\"'@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?[\"']",
+      ],
+      depNameTemplate: "aquasec/trivy",
+      datasourceTemplate: "docker",
+      autoReplaceStringTemplate: 'TRIVY_VERSION := "{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}"',
     },
     {
       customType: "regex",
-      description: "Dockerfile ENV: Task",
-      managerFilePatterns: ["(^|/)Dockerfile\\.golang$"],
+      description: "Trivy version in GitHub Actions",
+      managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      matchStrings: [
+        "TRIVY_VERSION:[ \\t]*[\"'](?<currentValue>[^\"'@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?[\"']",
+      ],
+      depNameTemplate: "aquasec/trivy",
+      datasourceTemplate: "docker",
+      autoReplaceStringTemplate: 'TRIVY_VERSION: "{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}"',
+    },
+    // ==========================================
+    // Yamllint (Justfile / GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Yamllint version in Justfile",
+      managerFilePatterns: ["/^justfile$/"],
+      matchStrings: [
+        "YAMLLINT_VERSION[ \\t]*:=[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"']",
+      ],
+      depNameTemplate: "adrienverge/yamllint",
+      datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: 'YAMLLINT_VERSION := "{{newValue}}"',
+    },
+    {
+      customType: "regex",
+      description: "Yamllint version in GitHub Actions",
+      managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      matchStrings: [
+        "YAMLLINT_VERSION:[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"']",
+      ],
+      depNameTemplate: "adrienverge/yamllint",
+      datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: 'YAMLLINT_VERSION: "{{newValue}}"',
+    },
+    // ==========================================
+    // Prettier (Justfile / GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Prettier version in Justfile",
+      managerFilePatterns: ["/^justfile$/"],
+      matchStrings: [
+        "PRETTIER_VERSION[ \\t]*:=[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"']",
+      ],
+      depNameTemplate: "prettier",
+      datasourceTemplate: "npm",
+      autoReplaceStringTemplate: 'PRETTIER_VERSION := "{{newValue}}"',
+    },
+    {
+      customType: "regex",
+      description: "Prettier version in GitHub Actions",
+      managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      matchStrings: [
+        "PRETTIER_VERSION:[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"']",
+      ],
+      depNameTemplate: "prettier",
+      datasourceTemplate: "npm",
+      autoReplaceStringTemplate: 'PRETTIER_VERSION: "{{newValue}}"',
+    },
+    // ==========================================
+    // Golang (GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Go version in composite actions",
+      managerFilePatterns: ["/action\\.ya?ml$/"],
+      matchStrings: [
+        "default:[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"'][ \\t]*#[ \\t]*renovate:[ \\t]*datasource=golang-version depName=go",
+      ],
+      depNameTemplate: "go",
+      datasourceTemplate: "golang-version",
+      autoReplaceStringTemplate: 'default: "{{newValue}}" # renovate: datasource=golang-version depName=go',
+    },
+    // ==========================================
+    // Task (Dockerfile / GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Task version in Dockerfile",
+      managerFilePatterns: ["/^Dockerfile\\.golang$/"],
       matchStrings: [
         "ENV[ \\t]+TASK_VERSION[=\\s][\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
       ],
       depNameTemplate: "go-task/task",
       datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: "ENV TASK_VERSION {{newValue}}",
+    },
+    {
+      customType: "regex",
+      description: "Task version in composite actions",
+      managerFilePatterns: ["/action\\.ya?ml$/"],
+      matchStrings: [
+        "default:[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"'][ \\t]*#[ \\t]*renovate:[ \\t]*datasource=github-releases depName=go-task/task",
+      ],
+      depNameTemplate: "go-task/task",
+      datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: 'default: "{{newValue}}" # renovate: datasource=github-releases depName=go-task/task',
+    },
+    // ==========================================
+    // Renovate (Justfile)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Renovate version in Justfile",
+      managerFilePatterns: ["/^justfile$/"],
+      matchStrings: [
+        "RENOVATE_VERSION[ \\t]*:=[ \\t]*[\"'](?<currentValue>[^\"'@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?[\"']",
+      ],
+      depNameTemplate: "renovate/renovate",
+      datasourceTemplate: "docker",
+      autoReplaceStringTemplate: 'RENOVATE_VERSION := "{{newValue}}{{#if newDigest}}@{{newDigest}}{{/if}}"',
     },
   ],
   packageRules: [
     {
       groupName: "Terraform Version",
-      matchPackageNames: ["/terraform/"],
+      matchPackageNames: ["hashicorp/terraform", "terraform"],
     },
     {
       groupName: "Go Ecosystem",
@@ -81,7 +216,10 @@
     },
     {
       groupName: "uv Version",
-      matchPackageNames: ["/ghcr.io/astral-sh/uv/", "/astral-sh/uv/"],
+      matchPackageNames: [
+        "/ghcr\\.io\\/astral-sh\\/uv\\//",
+        "/astral-sh\\/uv\\//",
+      ],
     },
     {
       groupName: "YamlLint Version",
@@ -94,7 +232,7 @@
     {
       groupName: "Renovate Docker Digest",
       matchDatasources: ["docker"],
-      matchDepNames: ["renovate/renovate"],
+      matchPackageNames: ["renovate/renovate"],
       pinDigests: true,
       separateMajorMinor: false,
     },
