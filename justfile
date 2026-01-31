@@ -44,7 +44,7 @@ trivy:
         --scanners misconfig,vuln .
 
 [private]
-PRETTIER_VERSION := "3.8.0" # renovate: datasource=npm depName=prettier
+PRETTIER_VERSION := "3.8.1" # renovate: datasource=npm depName=prettier
 # Prettier for YAML and JSON5 files
 prettier:
     docker compose run --rm node \
