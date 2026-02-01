@@ -46,7 +46,7 @@ jobs:
       - name: Run Prettier
         run: npx prettier@${{ env.PRETTIER_VERSION }} --check .
 
-  format-check:
+  terraform-format-check:
     name: Terraform Format Check
     runs-on: ubuntu-latest
     steps:
@@ -59,7 +59,7 @@ jobs:
       - name: Format Terraform code
         run: terraform fmt -check -recursive -diff
 
-  lint:
+  terraform-lint:
     name: Terraform Lint
     runs-on: ubuntu-latest
     steps:
@@ -107,11 +107,5 @@ jobs:
       id-token: write
       pull-requests: write
       issues: write
-    needs:
-      - yamllint
-      - prettier
-      - format-check
-      - lint
-      - security-scan
     uses: ./.github/workflows/terraform.yaml
     secrets: inherit
