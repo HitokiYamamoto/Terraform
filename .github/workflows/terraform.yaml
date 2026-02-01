@@ -59,6 +59,15 @@ jobs:
     outputs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
+      # Stateロックを回避するために、前の実行が終わるまで待機
+      - name: Wait for previous runs
+        uses: softprops/turnstyle@v2
+        with:
+          poll-interval-seconds: 5 # 前の実行が終わったか確認する間隔
+          same-branch-only: false # どのブランチからの実行でも、とにかく前のやつを待つ
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
