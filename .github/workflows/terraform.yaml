@@ -3,9 +3,10 @@ name: Terraform to Google Cloud CI/CD
 on:
   workflow_call:
 
+# 同じブランチの実行は1つだけに制限
 concurrency:
-  group: terraform-global-lock
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
