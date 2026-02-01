@@ -19,3 +19,8 @@ GCP-0077
 # GitHubのOrganization ProfileはREADMEを表示するためにpublicである必要がある
 # あと、普通にPublicリポジトリにしたいこともある
 GIT-0001
+
+# (HIGH): Branch protection does not require signed commits.
+# 個人開発でGPG署名を強制すると、開発者がローカルでGPG鍵を設定する必要があり煩雑。
+# PRマージ時にGitHubが自動署名してくれるため、実用上は問題ない。
+GIT-0004
