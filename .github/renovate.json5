@@ -1,6 +1,10 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:best-practices", ":disableDependencyDashboard"],
+  extends: [
+    "config:best-practices",
+    "security:minimumReleaseAgeNpm", // npmのパッケージの公開直後に起きる問題を回避(サプライチェーン攻撃への対策)
+    ":disableDependencyDashboard",
+  ],
   labels: ["renovate"],
   customManagers: [
     // ==========================================
