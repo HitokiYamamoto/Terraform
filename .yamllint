@@ -8,3 +8,5 @@ rules:
     indent-sequences: true  # リストもインデントする
     check-multi-line-strings: false  # 複数行文字列のインデントを無効化
   line-length: disable  # 行の長さを無効化
+  comments:
+    min-spaces-from-content: 1  # コメントと内容の間を1スペースに固定
