@@ -109,3 +109,54 @@ jobs:
       issues: write
     uses: ./.github/workflows/terraform.yaml
     secrets: inherit
+
+  # 統合チェックジョブ - Branch Protectionではこのジョブを必須にする
+  ci-result:
+    runs-on: ubuntu-latest
+    needs:
+      - yamllint
+      - prettier
+      - terraform-format-check
+      - terraform-lint
+      - security-scan
+      - terraform
+    if: always()
+    steps:
+      - name: Check all jobs status
+        run: |
+          # 全ジョブが成功しているか確認
+          # terraform は workflow_call なので、内部の terraform-result を見る
+          if [ "${{ needs.yamllint.result }}" != "success" ]; then
+            echo "❌ YAML lint job failed or was cancelled"
+            exit 1
+          fi
+
+          if [ "${{ needs.prettier.result }}" != "success" ]; then
+            echo "❌ Prettier job failed or was cancelled"
+            exit 1
+          fi
+
+          if [ "${{ needs.terraform-format-check.result }}" != "success" ]; then
+            echo "❌ Terraform format check job failed or was cancelled"
+            exit 1
+          fi
+
+          if [ "${{ needs.terraform-lint.result }}" != "success" ]; then
+            echo "❌ Terraform lint job failed or was cancelled"
+            exit 1
+          fi
+
+          if [ "${{ needs.security-scan.result }}" != "success" ]; then
+            echo "❌ Security scan job failed or was cancelled"
+            exit 1
+          fi
+
+          # terraform workflow 全体の結果をチェック
+          # workflow_call の場合、内部の terraform-result が最終判定するので
+          # ワークフロー全体が success であればOK
+          if [ "${{ needs.terraform.result }}" != "success" ]; then
+            echo "❌ Terraform workflow failed or was cancelled"
+            exit 1
+          fi
+
+          echo "✅ All CI checks passed successfully!"
