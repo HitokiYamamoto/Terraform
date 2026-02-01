@@ -20,6 +20,6 @@ runs:
       shell: bash
       run: |
         mkdir -p ${{ github.workspace }}/.terraform.d/plugin-cache
-        terraform -chdir=google-cloud init
+        terraform -chdir=google-cloud init -input=false
       env:
         TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
