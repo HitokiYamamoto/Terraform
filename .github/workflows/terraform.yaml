@@ -62,7 +62,7 @@ jobs:
     steps:
       # Stateロックを回避するために、前の実行が終わるまで待機
       - name: Wait for previous runs
-        uses: softprops/turnstyle@v2
+        uses: softprops/turnstyle@807f6009e7cee5c2c9faa41ccef03a8bb24b06ab # v2
         with:
           poll-interval-seconds: 5 # 前の実行が終わったか確認する間隔
           same-branch-only: false # どのブランチからの実行でも、とにかく前のやつを待つ
