@@ -198,6 +198,20 @@
       autoReplaceStringTemplate: 'default: "{{newValue}}" # renovate: datasource=github-releases depName=go-task/task',
     },
     // ==========================================
+    // Node.js (GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Node.js version in GitHub Actions",
+      managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      matchStrings: [
+        "NODE_VERSION:[ \\t]*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "node",
+      datasourceTemplate: "docker",
+      autoReplaceStringTemplate: "NODE_VERSION: {{newValue}}",
+    },
+    // ==========================================
     // Renovate (Justfile)
     // ==========================================
     {
@@ -217,6 +231,18 @@
       matchUpdateTypes: ["lockFileMaintenance"],
       schedule: ["before 9am on saturday"],
       timezone: "Asia/Tokyo",
+    },
+    {
+      groupName: "Node.js Version",
+      matchPackageNames: ["node"],
+      matchDatasources: ["docker"],
+      minimumReleaseAge: "3 days",
+    },
+    {
+      groupName: "Node.js Version",
+      matchPackageNames: ["node"],
+      matchManagers: ["custom.regex"],
+      pinDigests: false,
     },
     {
       groupName: "Terraform Version",
