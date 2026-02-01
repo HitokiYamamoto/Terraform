@@ -3,8 +3,8 @@
   extends: [
     "config:best-practices",
     "security:minimumReleaseAgeNpm", // npmのパッケージの公開直後に起きる問題を回避(サプライチェーン攻撃への対策)
-    ":disableDependencyDashboard",
   ],
+  dependencyDashboard: true,
   labels: ["renovate"],
   customManagers: [
     // ==========================================
