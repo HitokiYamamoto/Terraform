@@ -13,7 +13,10 @@ resource "github_branch_protection" "main" {
 
   allows_force_pushes = false // mainブランチでの強制プッシュを禁止
 
-  require_signed_commits = true // 署名されたコミットのみを許可（GitHub Appは自動的に署名される）
+  // NOTE: require_signed_commits = true にすると、開発者のローカルからのコミットに
+  //       GPG署名が必要になり、マージがブロックされる。
+  //       個人開発では設定が煩雑になるため、falseにしてTrivyの警告を.trivyignoreで抑制する。
+  require_signed_commits = false
 
   required_pull_request_reviews {
     required_approving_review_count = 0    // 「レビューは不要だが、PRという形式は必須」
