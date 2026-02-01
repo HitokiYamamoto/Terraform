@@ -127,3 +127,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: terraform -chdir=google-cloud apply -auto-approve -input=false
+
+  # 統合チェックジョブ - PRで必要なチェックが完了したか確認
+  terraform-result:
+    runs-on: ubuntu-latest
+    needs:
+      - init
+      - validate
+      - plan
+    if: always()
+    steps:
+      - name: Check required jobs status
+        run: |
+          # init, validate は常に必要
+          if [ "${{ needs.init.result }}" != "success" ]; then
+            echo "❌ Init job failed or was cancelled"
+            exit 1
+          fi
+
+          if [ "${{ needs.validate.result }}" != "success" ]; then
+            echo "❌ Validate job failed or was cancelled"
+            exit 1
+          fi
+
+          # plan は PR または main へのpushで実行される
+          # スキップされた場合は success として扱う
+          if [ "${{ needs.plan.result }}" == "failure" ] || [ "${{ needs.plan.result }}" == "cancelled" ]; then
+            echo "❌ Plan job failed or was cancelled"
+            exit 1
+          fi
+
+          echo "✅ All required Terraform checks passed successfully!"
