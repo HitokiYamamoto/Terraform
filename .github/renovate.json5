@@ -60,6 +60,23 @@
       autoReplaceStringTemplate: "ENV TFLINT_VERSION {{newValue}}",
     },
     // ==========================================
+    // tfcmt (GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "tfcmt version in GitHub Actions",
+      managerFilePatterns: [
+        "/^\\.github\\/(workflows|actions)\\/.*\\.ya?ml$/",
+        "/^action\\.ya?ml$/",
+      ],
+      matchStrings: [
+        "TFCMT_VERSION:[ \\t]*[\"']?(?<currentValue>v?[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "suzuki-shunsuke/tfcmt",
+      datasourceTemplate: "github-releases",
+      autoReplaceStringTemplate: "TFCMT_VERSION: {{newValue}}",
+    },
+    // ==========================================
     // Trivy (Justfile / GitHub Actions)
     // ==========================================
     {
