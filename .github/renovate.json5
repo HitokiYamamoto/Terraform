@@ -1,6 +1,10 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:best-practices", ":disableDependencyDashboard"],
+  extends: [
+    "config:best-practices",
+    "security:minimumReleaseAgeNpm", // npmのパッケージの公開直後に起きる問題を回避(サプライチェーン攻撃への対策)
+    ":disableDependencyDashboard",
+  ],
   labels: ["renovate"],
   customManagers: [
     // ==========================================
@@ -194,6 +198,20 @@
       autoReplaceStringTemplate: 'default: "{{newValue}}" # renovate: datasource=github-releases depName=go-task/task',
     },
     // ==========================================
+    // Node.js (GitHub Actions)
+    // ==========================================
+    {
+      customType: "regex",
+      description: "Node.js version in GitHub Actions",
+      managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      matchStrings: [
+        "NODE_VERSION:[ \\t]*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
+      ],
+      depNameTemplate: "node",
+      datasourceTemplate: "docker",
+      autoReplaceStringTemplate: "NODE_VERSION: {{newValue}}",
+    },
+    // ==========================================
     // Renovate (Justfile)
     // ==========================================
     {
@@ -209,6 +227,23 @@
     },
   ],
   packageRules: [
+    {
+      matchUpdateTypes: ["lockFileMaintenance"],
+      schedule: ["before 9am on saturday"],
+      timezone: "Asia/Tokyo",
+    },
+    {
+      groupName: "Node.js Version",
+      matchPackageNames: ["node"],
+      matchDatasources: ["docker"],
+      minimumReleaseAge: "3 days",
+    },
+    {
+      groupName: "Node.js Version",
+      matchPackageNames: ["node"],
+      matchManagers: ["custom.regex"],
+      pinDigests: false,
+    },
     {
       groupName: "Terraform Version",
       matchPackageNames: ["hashicorp/terraform", "terraform"],
