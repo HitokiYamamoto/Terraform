@@ -24,6 +24,7 @@ jobs:
         with:
           python-version: "3.14.2"
           version: "0.9.28"
+          enable-cache: false # uv tool runで毎回ツールをインストールするためキャッシュ無効化
 
       - name: Run yamllint
         run: uv tool run yamllint@${{ env.YAMLLINT_VERSION }} .
