@@ -328,7 +328,7 @@ module "terraform" {
   repository_name        = "Terraform"
   description            = "インフラリソース管理用リポジトリ"
   visibility             = "public"
-  has_issues             = false
+  has_issues             = true
   has_wiki               = false
   auto_init              = true
   topics                 = ["terraform", "infrastructure", "iac"]
