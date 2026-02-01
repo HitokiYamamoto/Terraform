@@ -10,7 +10,6 @@ resource "github_repository" "main" {
   delete_branch_on_merge = var.delete_branch_on_merge
   vulnerability_alerts   = true
   archived               = var.archived
-  allow_forking          = false // デフォルトでtrueだが、個人アカウントのリポジトリでは「フォークを禁止する」という設定自体がAPI経由でサポートされていない
 
   /* NOTE: デフォルトブランチをmainに設定
   auto_init = true の場合、自動的にmainブランチが作成される
