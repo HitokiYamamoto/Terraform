@@ -15,9 +15,3 @@ resource "github_repository" "main" {
   auto_init = true の場合、自動的にmainブランチが作成される
   */
 }
-
-/* NOTE: ブランチ保護ルールの設定
-
-ブランチ保護ルールの設定を追加したいが、Privateリポジトリはできない
-回避するには、Publicリポジトリにするか、有料プランにするしかない
-*/

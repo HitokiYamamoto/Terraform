@@ -327,7 +327,7 @@ module "terraform" {
   source                 = "./modules/repository"
   repository_name        = "Terraform"
   description            = "インフラリソース管理用リポジトリ"
-  visibility             = "private"
+  visibility             = "public"
   has_issues             = false
   has_wiki               = false
   auto_init              = true
