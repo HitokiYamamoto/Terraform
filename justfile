@@ -59,11 +59,16 @@ yamllint:
 
 # Golangのタスク実行(default: task list)
 task +args="":
-    docker compose run --rm golang \
-        task {{ args }}
+    #!/usr/bin/env zsh
+    # testはfirestoreエミュレータ起動後に実行するため除外
+    if [ "{{ args }}" = "test" ]; then
+        just task-test
+    else
+        docker compose run --rm golang task {{ args }}
+    fi
 
 # Golangのユニットテスト実行
-test:
+task-test:
     docker compose up firestore --detach
     docker compose run --rm golang task test
     docker compose down
