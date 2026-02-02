@@ -335,3 +335,16 @@ module "terraform" {
   delete_branch_on_merge = true
   archived               = false
 }
+
+module "zenn" {
+  source                 = "./modules/repository"
+  repository_name        = "Zenn"
+  description            = "Zenn記事管理用リポジトリ"
+  visibility             = "private"
+  has_issues             = true
+  has_wiki               = false
+  auto_init              = true
+  topics                 = ["zenn", "articles", "blog"]
+  delete_branch_on_merge = true
+  archived               = false
+}
