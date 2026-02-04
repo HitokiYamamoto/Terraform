@@ -62,7 +62,7 @@ YAMLLINT_VERSION := "v1.38.0"
 # Lint check for YAML files
 yamllint:
     docker compose run --rm python \
-        uv tool run yamllint@{{ YAMLLINT_VERSION }} .
+        uv tool run yamllint@{{ YAMLLINT_VERSION }} --config-file config/.yamllint .
 
 # Golangのタスク実行(default: task list)
 task +args="":

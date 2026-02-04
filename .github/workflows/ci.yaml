@@ -27,7 +27,7 @@ jobs:
           enable-cache: false # uv tool runで毎回ツールをインストールするためキャッシュ無効化
 
       - name: Run yamllint
-        run: uv tool run yamllint@${{ env.YAMLLINT_VERSION }} .
+        run: uv tool run yamllint@${{ env.YAMLLINT_VERSION }} --config-file config/.yamllint .
 
   prettier:
     name: Prettier Check
