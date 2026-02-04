@@ -77,8 +77,8 @@ jobs:
 
       - name: Run tflint
         run: |
-          tflint --init
-          tflint --recursive
+          tflint --config ${{ github.workspace }}/config/.tflint.hcl --init
+          tflint --config ${{ github.workspace }}/config/.tflint.hcl --recursive
 
   security-scan:
     name: Security Scan

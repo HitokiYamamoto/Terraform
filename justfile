@@ -31,8 +31,7 @@ terraform-format:
 
 # terraform validate && terraform tflint
 terraform-lint:
-    docker compose run --rm terraform tflint --init && tflint --recursive
-    docker compose run --rm terraform tflint --recursive
+    docker compose run --rm terraform sh -c "tflint --config /home/terraform/workspace/config/.tflint.hcl --init && tflint --config /home/terraform/workspace/config/.tflint.hcl --recursive"
     docker compose run --rm terraform terraform -chdir=google-cloud validate
 
 [private]
