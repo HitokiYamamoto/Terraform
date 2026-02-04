@@ -31,8 +31,7 @@ terraform-format:
 
 # terraform validate && terraform tflint
 terraform-lint:
-    docker compose run --rm terraform tflint --init && tflint --recursive
-    docker compose run --rm terraform tflint --recursive
+    docker compose run --rm terraform sh -c "tflint --config /home/terraform/workspace/config/.tflint.hcl --init && tflint --config /home/terraform/workspace/config/.tflint.hcl --recursive"
     docker compose run --rm terraform terraform -chdir=google-cloud validate
 
 [private]
@@ -45,7 +44,7 @@ trivy:
         --workdir /app \
         aquasec/trivy:{{ TRIVY_VERSION }} \
         filesystem \
-        --ignorefile .trivyignore \
+        --ignorefile config/.trivyignore \
         --skip-files "google-cloud/bootstrap/main.tf" \
         --scanners misconfig,vuln .
 
@@ -55,7 +54,7 @@ PRETTIER_VERSION := "3.8.1"
 # Prettier for YAML and JSON5 files
 prettier:
     docker compose run --rm node \
-        npx prettier@{{ PRETTIER_VERSION }} --write "**/*.yaml" "**/*.json5"
+        npx prettier@{{ PRETTIER_VERSION }} --config config/.prettierrc --write "**/*.yaml" "**/*.json5"
 
 [private]
 YAMLLINT_VERSION := "v1.38.0"
@@ -63,7 +62,7 @@ YAMLLINT_VERSION := "v1.38.0"
 # Lint check for YAML files
 yamllint:
     docker compose run --rm python \
-        uv tool run yamllint@{{ YAMLLINT_VERSION }} .
+        uv tool run yamllint@{{ YAMLLINT_VERSION }} --config-file config/.yamllint .
 
 # Golangのタスク実行(default: task list)
 task +args="":
