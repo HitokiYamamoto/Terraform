@@ -25,7 +25,7 @@ resource "github_branch_protection" "main" {
 
   // GitHub Actionsのジョブが成功していることを必須にする
   required_status_checks {
-    strict   = true
+    strict   = false
     contexts = var.job_list # Actionsのジョブ名
   }
 }
