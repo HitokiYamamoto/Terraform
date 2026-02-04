@@ -55,7 +55,7 @@ PRETTIER_VERSION := "3.8.1"
 # Prettier for YAML and JSON5 files
 prettier:
     docker compose run --rm node \
-        npx prettier@{{ PRETTIER_VERSION }} --write "**/*.yaml" "**/*.json5"
+        npx prettier@{{ PRETTIER_VERSION }} --config config/.prettierrc --write "**/*.yaml" "**/*.json5"
 
 [private]
 YAMLLINT_VERSION := "v1.38.0"

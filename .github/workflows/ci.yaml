@@ -45,7 +45,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Run Prettier
-        run: npx prettier@${{ env.PRETTIER_VERSION }} --check .
+        run: npx prettier@${{ env.PRETTIER_VERSION }} --config config/.prettierrc --check .
 
   terraform-format-check:
     name: Terraform Format Check
