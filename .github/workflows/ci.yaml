@@ -99,7 +99,7 @@ jobs:
           exit-code: "1"
           severity: CRITICAL,HIGH,MEDIUM,LOW
           scanners: misconfig,secret,vuln
-          trivyignores: .trivyignore
+          trivyignores: config/.trivyignore
           skip-files: "google-cloud/bootstrap/main.tf" # GCP-0078が誤検知するためスキップ
 
   terraform:

@@ -44,7 +44,7 @@ trivy:
         --workdir /app \
         aquasec/trivy:{{ TRIVY_VERSION }} \
         filesystem \
-        --ignorefile .trivyignore \
+        --ignorefile config/.trivyignore \
         --skip-files "google-cloud/bootstrap/main.tf" \
         --scanners misconfig,vuln .
 
