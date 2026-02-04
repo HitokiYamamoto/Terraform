@@ -271,10 +271,7 @@
     },
     {
       groupName: "uv Version",
-      matchPackageNames: [
-        "/ghcr\\.io\\/astral-sh\\/uv\\//",
-        "/astral-sh\\/uv\\//",
-      ],
+      matchPackageNames: ["/ghcr\\.io\\/astral-sh\\/uv/", "/astral-sh\\/uv/"],
     },
     {
       groupName: "YamlLint Version",
