@@ -23,7 +23,7 @@ jobs:
         uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7
         with:
           python-version: "3.14.2"
-          version: "0.9.29"
+          version: "0.9.30"
           enable-cache: false # uv tool runで毎回ツールをインストールするためキャッシュ無効化
 
       - name: Run yamllint
