@@ -4,5 +4,6 @@ module "terraform_protect" {
   job_list = [
     "ci-result",           # Terraformワークフローの統合チェック
     "check-golang-result", # Goファイルチェック
+    "docker-build-result", # Dockerビルドチェック
   ]
 }
