@@ -35,7 +35,7 @@ terraform-lint:
     docker compose run --rm terraform terraform -chdir=google-cloud validate
 
 [private]
-TRIVY_VERSION := "0.69.0@sha256:33f816d414b9d582d25bb737ffa4a632ae34e222f7ec1b50252cef0ce2266006"
+TRIVY_VERSION := "0.69.1@sha256:1c78ed1ef824ab8bb05b04359d186e4c1229d0b3e67005faacb54a7d71974f73"
 
 # security scan with trivy
 trivy:
