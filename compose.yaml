@@ -4,7 +4,7 @@ services:
   terraform:
     build:
       context: ./docker/build
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.terraform
     env_file:
       - .env
     volumes:
