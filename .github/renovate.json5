@@ -203,13 +203,13 @@
     {
       customType: "regex",
       description: "Node.js version in GitHub Actions",
-      managerFilePatterns: ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      managerFilePatterns: ["/^\\.github/workflows/.+\\.ya?ml$/"],
       matchStrings: [
-        "NODE_VERSION:[ \\t]*[\"']?(?<currentValue>[\\d\\.]+)[\"']?",
+        "node-version:\\s*[\"']?(?<currentValue>\\d+\\.\\d+\\.\\d+)[\"']?",
       ],
-      depNameTemplate: "node",
       datasourceTemplate: "docker",
-      autoReplaceStringTemplate: "NODE_VERSION: {{newValue}}",
+      depNameTemplate: "node",
+      versioningTemplate: "docker",
     },
     // ==========================================
     // Python (GitHub Actions)
@@ -251,12 +251,6 @@
       matchPackageNames: ["node"],
       matchDatasources: ["docker"],
       minimumReleaseAge: "3 days",
-    },
-    {
-      groupName: "Node.js Version",
-      matchPackageNames: ["node"],
-      matchManagers: ["custom.regex"],
-      pinDigests: false,
     },
     {
       groupName: "Terraform Version",
