@@ -128,3 +128,16 @@ module "zenn" {
   delete_branch_on_merge = true
   archived               = false
 }
+
+module "budget_book" {
+  source                 = "./modules/repository"
+  repository_name        = "Budget-Book"
+  description            = "家計簿管理用リポジトリ"
+  visibility             = "private"
+  has_issues             = false
+  has_wiki               = false
+  auto_init              = true
+  topics                 = ["budget", "typescript", "react"]
+  delete_branch_on_merge = true
+  archived               = false
+}
