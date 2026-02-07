@@ -93,7 +93,7 @@ budget-publish-test:
         }'
 
 [private]
-RENOVATE_VERSION := "43.4.0@sha256:47730e9fd996d6978756126c290567e550a1abae727dfadad0ba61c4da37f272"
+RENOVATE_VERSION := "43.4.1@sha256:b0cf39402214df4b72f94154435bc5e3cea8db21271ac434cd671ebc6fd1e911"
 
 # Renovateの設定ファイル検証
 renovate-validate:
