@@ -207,9 +207,9 @@
       matchStrings: [
         "node-version:\\s*[\"']?(?<currentValue>\\d+\\.\\d+\\.\\d+)[\"']?",
       ],
-      datasourceTemplate: "docker",
+      datasourceTemplate: "node-version",
       depNameTemplate: "node",
-      versioningTemplate: "docker",
+      autoReplaceStringTemplate: "node-version {{newValue}}",
     },
     // ==========================================
     // Python (GitHub Actions)
@@ -249,7 +249,7 @@
     {
       groupName: "Node.js Version",
       matchPackageNames: ["node"],
-      matchDatasources: ["docker"],
+      matchDatasources: ["docker", "node-version"],
       minimumReleaseAge: "3 days",
     },
     {
