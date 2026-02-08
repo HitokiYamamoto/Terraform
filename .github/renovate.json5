@@ -166,11 +166,11 @@
       description: "Go version in composite actions",
       managerFilePatterns: ["/action\\.ya?ml$/"],
       matchStrings: [
-        "default:[ \\t]*[\"'](?<currentValue>[^\"'\\s]+)[\"'][ \\t]*#[ \\t]*renovate:[ \\t]*datasource=golang-version depName=go",
+        "go-version:[ \\t]*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?",
       ],
       depNameTemplate: "go",
       datasourceTemplate: "golang-version",
-      autoReplaceStringTemplate: 'default: "{{newValue}}" # renovate: datasource=golang-version depName=go',
+      autoReplaceStringTemplate: 'go-version: "{{newValue}}"',
     },
     // ==========================================
     // Task (Dockerfile / GitHub Actions)
