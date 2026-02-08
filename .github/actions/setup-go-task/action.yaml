@@ -1,14 +1,6 @@
 name: Setup Go and Task
 description: Common setup for Go and Task
 inputs:
-  go-version:
-    description: "Go version to use"
-    required: false
-    default: "1.25.7" # renovate: datasource=golang-version depName=go
-  task-version:
-    description: "Task version to use"
-    required: false
-    default: "3.48.0" # renovate: datasource=github-releases depName=go-task/task
   working-directory:
     description: "Directory where go.sum is located"
     required: false
@@ -20,10 +12,10 @@ runs:
     - name: Set up Golang
       uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
       with:
-        go-version: ${{ inputs.go-version }}
+        go-version: "1.25.7"
         cache-dependency-path: ${{ inputs.working-directory }}/go.sum
 
     - name: Install Task
       uses: go-task/setup-task@0ab1b2a65bc55236a3bc64cde78f80e20e8885c2 # v1
       with:
-        version: ${{ inputs.task-version }}
+        version: "3.48.0" # renovate: datasource=github-releases depName=go-task/task
